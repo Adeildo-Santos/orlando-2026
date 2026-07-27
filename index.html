@@ -91,6 +91,7 @@ const SUPABASE_URL = window.__SUPABASE_URL__ || "";
 const SUPABASE_ANON_KEY = window.__SUPABASE_ANON_KEY__ || "";
 const SUPABASE_TRIP_ID = window.__SUPABASE_TRIP_ID__ || DEMO_TRIP_ID;
 const DEFAULT_COVER_IMAGE = "./orlando-cover.jpg";
+const PANEL_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] };
 
 const resolveCoverImage = (value) => {
   const src = String(value || "").trim();
@@ -370,6 +371,9 @@ function App() {
   const [selectedDayId, setSelectedDayId] = useState(null);
   const [viewMode, setViewMode] = useState("timeline");
   const [loading, setLoading] = useState(true);
+  const [loadSource, setLoadSource] = useState("loading");
+  const [loadError, setLoadError] = useState(null);
+  const [reloadToken, setReloadToken] = useState(0);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -377,14 +381,19 @@ function App() {
 
     async function boot() {
       setLoading(true);
+      setLoadError(null);
+      setLoadSource("loading");
       try {
         const remote = await loadItineraryFromSupabase();
         if (!mounted) return;
         setData(remote || demoData);
+        setLoadSource(remote ? "remote" : "demo");
         setToast(remote ? "Sincronizado com Supabase" : "Exibindo dados de demonstração");
       } catch {
         if (!mounted) return;
         setData(demoData);
+        setLoadSource("error");
+        setLoadError("Não foi possível sincronizar com o Supabase agora.");
         setToast("Exibindo dados de demonstração");
       } finally {
         if (mounted) setLoading(false);
@@ -396,7 +405,7 @@ function App() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [reloadToken]);
 
   useEffect(() => {
     if (!data?.days?.length) return;
@@ -438,7 +447,19 @@ function App() {
 
   const activeDayLabel = selectedDay ? `Dia ${selectedDay.day_number} • ${selectedDayActivities.length} atividades` : "Selecione um dia";
   const tripRange = formatDateRange(trip.start_date, trip.end_date);
-  const synced = Boolean(data && !loading);
+  const synced = loadSource === "remote" && Boolean(data) && !loading;
+  const syncLabel = loading
+    ? "Sincronizando"
+    : loadSource === "remote"
+      ? "Sincronizado no Supabase"
+      : loadSource === "error"
+        ? "Dados locais"
+        : "Dados de demonstração";
+
+  const retryLoad = () => {
+    setToast("Tentando sincronizar novamente");
+    setReloadToken((current) => current + 1);
+  };
 
   const shareTrip = async () => {
     const payload = {
@@ -486,19 +507,21 @@ function App() {
     "div",
     { className: "min-h-screen bg-slate-50 text-slate-900" },
     h("div", { className: "safe-shell flex min-h-screen w-full flex-col px-3 pb-5 pt-3 sm:px-5 sm:pb-8 sm:pt-4 lg:px-8" },
-      h(HeaderBar, { trip, tripRange, synced, actionButtons, days, totals, loading }),
+      h(HeaderBar, { trip, tripRange, synced, actionButtons, days, totals, loading, syncLabel }),
+      h(SyncBanner, { loading, loadSource, loadError, onRetry: retryLoad }),
       h("main", { className: "mt-4 grid w-full min-w-0 flex-1 gap-4 lg:mt-5 lg:grid-cols-[minmax(0,1fr)_352px] lg:gap-6" },
         h("section", { className: "w-full min-w-0 space-y-6" },
-          h(TripHero, { trip, tripRange, days, loading, synced }),
+          h(TripHero, { trip, tripRange, days, loading, synced, syncLabel }),
           h(DayTabs, { days, selectedDayId, setSelectedDayId, activeDayLabel, loading }),
-          h(AnimatePresence, { mode: "wait" },
+          h(AnimatePresence, { mode: "wait", initial: false },
             viewMode === "timeline"
               ? h(motion.div, {
                   key: "timeline",
-                  initial: { opacity: 0, y: 16 },
-                  animate: { opacity: 1, y: 0 },
-                  exit: { opacity: 0, y: -12 },
-                  transition: { duration: 0.25 }
+                  layout: true,
+                  initial: { opacity: 0, y: 16, scale: 0.99 },
+                  animate: { opacity: 1, y: 0, scale: 1 },
+                  exit: { opacity: 0, y: -12, scale: 0.99 },
+                  transition: PANEL_TRANSITION
                 }, h(ActivityTimeline, {
                   day: selectedDay,
                   activities: selectedDayActivities,
@@ -507,10 +530,11 @@ function App() {
                 }))
               : h(motion.div, {
                   key: "map",
-                  initial: { opacity: 0, y: 16 },
-                  animate: { opacity: 1, y: 0 },
-                  exit: { opacity: 0, y: -12 },
-                  transition: { duration: 0.25 }
+                  layout: true,
+                  initial: { opacity: 0, y: 16, scale: 0.99 },
+                  animate: { opacity: 1, y: 0, scale: 1 },
+                  exit: { opacity: 0, y: -12, scale: 0.99 },
+                  transition: PANEL_TRANSITION
                 }, h(MapModePanel, {
                   day: selectedDay,
                   activities: selectedDayActivities,
@@ -529,7 +553,7 @@ function App() {
   );
 }
 
-function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loading }) {
+function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loading, syncLabel }) {
   return h(
     "div",
     { className: "flex w-full flex-col gap-3 overflow-hidden rounded-3xl border border-white/60 bg-white/75 px-3 py-3 shadow-soft backdrop-blur-md sm:px-5 lg:flex-row lg:items-center lg:justify-between" },
@@ -537,7 +561,7 @@ function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loadi
       h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Itinerary View"),
       h("div", { className: "mt-1 flex items-center gap-2" },
         h("h1", { className: "truncate text-base font-semibold text-slate-900 sm:text-lg" }, trip.title),
-        h(StatusPill, { synced, loading })
+        h(StatusPill, { synced, loading, syncLabel })
       ),
       h("p", { className: "mt-0.5 text-xs text-slate-500" }, `${trip.destination} • ${tripRange}`)
     ),
@@ -558,7 +582,78 @@ function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loadi
   );
 }
 
-function StatusPill({ synced, loading }) {
+function SyncBanner({ loading, loadSource, loadError, onRetry }) {
+  if (loading && loadSource === "loading") {
+    return h(
+      motion.div,
+      {
+        initial: { opacity: 0, y: -8 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -8 },
+        transition: PANEL_TRANSITION,
+        className: "mt-3 rounded-3xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-sm"
+      },
+      h("div", { className: "flex items-center gap-3" },
+        h("div", { className: "flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-600 shadow-sm" },
+          h("span", { className: "h-4 w-4 animate-spin rounded-full border-2 border-sky-200 border-t-sky-600" })
+        ),
+        h("div", { className: "min-w-0 flex-1" },
+          h("p", { className: "text-sm font-semibold text-sky-900" }, "Sincronizando com Supabase"),
+          h("p", { className: "mt-0.5 text-xs text-sky-700" }, "Buscando o roteiro mais recente e atualizando a tela.")
+        )
+      )
+    );
+  }
+
+  if (loadSource === "error") {
+    return h(
+      motion.div,
+      {
+        initial: { opacity: 0, y: -8 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -8 },
+        transition: PANEL_TRANSITION,
+        className: "mt-3 rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm"
+      },
+      h("div", { className: "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" },
+        h("div", { className: "min-w-0" },
+          h("p", { className: "text-sm font-semibold text-amber-900" }, "Não conseguimos sincronizar agora"),
+          h("p", { className: "mt-0.5 text-xs text-amber-800" }, loadError || "Estamos mostrando os dados de demonstração para você continuar navegando.")
+        ),
+        h("button", {
+          type: "button",
+          onClick: onRetry,
+          className: "inline-flex items-center justify-center rounded-full bg-amber-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-800"
+        }, "Tentar novamente")
+      )
+    );
+  }
+
+  if (loadSource === "demo") {
+    return h(
+      motion.div,
+      {
+        initial: { opacity: 0, y: -8 },
+        animate: { opacity: 1, y: 0 },
+        transition: PANEL_TRANSITION,
+        className: "mt-3 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 shadow-sm"
+      },
+      h("div", { className: "flex items-center gap-3" },
+        h("div", { className: "flex h-9 w-9 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm" },
+          h(BadgeCheck, { className: "h-4 w-4" })
+        ),
+        h("div", { className: "min-w-0" },
+          h("p", { className: "text-sm font-semibold text-emerald-900" }, "Dados de demonstração ativos"),
+          h("p", { className: "mt-0.5 text-xs text-emerald-700" }, "Conecte o Supabase para trocar o conteúdo pelo roteiro real.")
+        )
+      )
+    );
+  }
+
+  return null;
+}
+
+function StatusPill({ synced, loading, syncLabel }) {
   return h(
     "span",
     {
@@ -572,7 +667,7 @@ function StatusPill({ synced, loading }) {
       )
     },
     h(BadgeCheck, { className: "h-3.5 w-3.5" }),
-    synced ? "Sincronizado" : "Carregando"
+    syncLabel || (synced ? "Sincronizado" : "Carregando")
   );
 }
 
@@ -604,7 +699,7 @@ function ActionButton({ label, icon: Icon, onClick, compact }) {
   );
 }
 
-function TripHero({ trip, tripRange, days, loading, synced }) {
+function TripHero({ trip, tripRange, days, loading, synced, syncLabel }) {
   const participants = [
     { name: "Ana", color: "bg-emerald-500" },
     { name: "Bruno", color: "bg-sky-500" },
@@ -643,7 +738,7 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
             ),
             h("span", { className: "inline-flex items-center gap-2 rounded-full bg-emerald-400/15 px-3 py-1.5 text-emerald-100 ring-1 ring-emerald-300/20 backdrop-blur" },
               h(Star, { className: "h-3.5 w-3.5" }),
-              synced ? "Sincronizado no Supabase" : "Carregando dados"
+              syncLabel || (synced ? "Sincronizado no Supabase" : "Carregando dados")
             )
           ),
           h("div", { className: "mt-4 flex flex-wrap items-center gap-3 sm:mt-5" },
@@ -761,8 +856,15 @@ function DayTabs({ days, selectedDayId, setSelectedDayId, activeDayLabel, loadin
 
 function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
   return h(
-    "section",
-    { className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5 lg:p-6" },
+    motion.section,
+    {
+      layout: true,
+      initial: { opacity: 0, y: 10 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, y: -10 },
+      transition: PANEL_TRANSITION,
+      className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5 lg:p-6"
+    },
     h("div", { className: "flex flex-wrap items-end justify-between gap-4 border-b border-slate-100 pb-4" },
       h("div", null,
         h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Linha do tempo"),
@@ -916,8 +1018,15 @@ function EmptyDayState() {
 
 function MapModePanel({ day, activities, onBack }) {
   return h(
-    "section",
-    { className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5" },
+    motion.section,
+    {
+      layout: true,
+      initial: { opacity: 0, y: 10 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, y: -10 },
+      transition: PANEL_TRANSITION,
+      className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5"
+    },
     h("div", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4" },
       h("div", null,
         h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Modo mapa"),
