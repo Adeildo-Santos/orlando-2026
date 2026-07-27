@@ -518,7 +518,7 @@ function App() {
                 }))
           )
         ),
-        h("aside", { className: "w-full min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start" },
+        h("aside", { className: "hidden w-full min-w-0 space-y-4 sm:block lg:sticky lg:top-4 lg:self-start" },
           h(ProgressWidget, { totals, loading }),
           h(BudgetWidget, { totals, loading }),
           h(RoadmapWidget, { day: selectedDay, activities: selectedDayActivities, loading })
@@ -532,7 +532,7 @@ function App() {
 function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loading }) {
   return h(
     "div",
-    { className: "flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/75 px-3 py-3 shadow-soft backdrop-blur-md sm:px-5 lg:flex-row lg:items-center lg:justify-between" },
+    { className: "flex w-full flex-col gap-3 overflow-hidden rounded-3xl border border-white/60 bg-white/75 px-3 py-3 shadow-soft backdrop-blur-md sm:px-5 lg:flex-row lg:items-center lg:justify-between" },
     h("div", { className: "min-w-0" },
       h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Itinerary View"),
       h("div", { className: "mt-1 flex items-center gap-2" },
@@ -541,13 +541,11 @@ function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loadi
       ),
       h("p", { className: "mt-0.5 text-xs text-slate-500" }, `${trip.destination} • ${tripRange}`)
     ),
-    h("div", { className: "flex flex-wrap items-center gap-2 lg:hidden" },
-      h(MiniStat, { label: "Dias", value: days.length || "—" }),
-      h(MiniStat, { label: "Concluído", value: `${totals.progress || 0}%` })
-    ),
-    h("div", { className: "flex flex-wrap gap-2 lg:hidden" },
+    h("div", { className: "flex w-full flex-wrap items-center gap-2 lg:hidden" },
+      h(MiniStat, { label: "Dias", value: days.length || "—", compact: true }),
+      h(MiniStat, { label: "Concluído", value: `${totals.progress || 0}%`, compact: true }),
       ...actionButtons.map((action) =>
-        h(ActionButton, { key: action.label, label: action.label, icon: action.icon, onClick: action.onClick })
+        h(ActionButton, { key: action.label, label: action.label, icon: action.icon, onClick: action.onClick, compact: true })
       )
     ),
     h("div", { className: "hidden flex-wrap items-center gap-2 lg:flex" },
@@ -578,27 +576,31 @@ function StatusPill({ synced, loading }) {
   );
 }
 
-function MiniStat({ label, value }) {
+function MiniStat({ label, value, compact }) {
   return h(
     "div",
-    { className: "rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-right" },
+    { className: cx(compact ? "shrink-0" : "", "rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-right") },
     h("p", { className: "text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400" }, label),
     h("p", { className: "text-sm font-semibold text-slate-900" }, value)
   );
 }
 
-function ActionButton({ label, icon: Icon, onClick }) {
+function ActionButton({ label, icon: Icon, onClick, compact }) {
   return h(
     motion.button,
     {
       type: "button",
       whileTap: { scale: 0.98 },
       onClick,
+      "aria-label": label,
       className:
-        "inline-flex min-w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-700 sm:px-4 sm:text-sm"
+        cx(
+          "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-700 sm:px-4 sm:text-sm",
+          compact ? "h-10 w-10 shrink-0 justify-center gap-0 px-0 py-0" : "min-w-fit"
+        )
     },
-    h(Icon, { className: "h-4 w-4" }),
-    label
+    h(Icon, { className: compact ? "h-4 w-4" : "h-4 w-4" }),
+    compact ? null : label
   );
 }
 
@@ -615,7 +617,7 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
       initial: { opacity: 0, y: 18 },
       animate: { opacity: 1, y: 0 },
       transition: { duration: 0.35 },
-      className: "relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-slate-900 shadow-soft lg:rounded-[2rem]"
+      className: "relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-slate-900 shadow-soft lg:rounded-[2rem]"
     },
     h("div", {
       className: "absolute inset-0 bg-cover bg-center",
@@ -625,7 +627,7 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
     }),
     h("div", { className: "absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-900/30" }),
     h("div", { className: "absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.28),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.18),transparent_24%)]" }),
-    h("div", { className: "relative flex min-h-[300px] flex-col justify-between p-4 sm:min-h-[360px] sm:p-6 lg:p-8" },
+    h("div", { className: "relative flex min-h-[250px] flex-col justify-between p-4 sm:min-h-[360px] sm:p-6 lg:p-8" },
       h("div", { className: "flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between" },
         h("div", { className: "min-w-0 flex-1 pr-0 sm:pr-3" },
           h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.34em] text-emerald-200/90 sm:text-[11px]" }, trip.destination),
@@ -643,6 +645,26 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
               h(Star, { className: "h-3.5 w-3.5" }),
               synced ? "Sincronizado no Supabase" : "Carregando dados"
             )
+          ),
+          h("div", { className: "mt-4 flex flex-wrap items-center gap-3 sm:mt-5" },
+            h("div", { className: "flex items-center -space-x-2" },
+              participants.map((participant, index) =>
+                h(
+                  "span",
+                  {
+                    key: participant.name,
+                    title: participant.name,
+                    className: cx(
+                      "flex h-8 w-8 items-center justify-center rounded-full border-2 border-slate-950/60 text-[10px] font-bold text-white shadow-sm",
+                      participant.color
+                    ),
+                    style: { zIndex: participants.length - index }
+                  },
+                  participant.name.charAt(0)
+                )
+              )
+            ),
+            h("span", { className: "text-xs font-semibold uppercase tracking-[0.24em] text-white/70" }, `${participants.length} participantes`)
           )
         ),
         h("div", { className: "w-full max-w-none self-start rounded-3xl border border-white/15 bg-white/10 p-2.5 text-white shadow-xl backdrop-blur-md sm:-mt-2 sm:max-w-[260px] lg:max-w-[280px]" },
@@ -650,7 +672,7 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
             h("img", {
               src: resolveCoverImage(trip.cover_image_url),
               alt: `${trip.destination} - capa da viagem`,
-              className: "h-36 w-full object-cover sm:h-36 lg:h-44"
+              className: "h-28 w-full object-cover sm:h-36 lg:h-44"
             })
           ),
           h("div", { className: "p-2.5 sm:p-3" },
@@ -660,7 +682,7 @@ function TripHero({ trip, tripRange, days, loading, synced }) {
           )
         )
       ),
-      h("div", { className: "mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3" },
+      h("div", { className: "hidden mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3" },
         h(HeroStat, { label: "Dias", value: `${days.length || 0}`, accent: "text-emerald-200" }),
         h(HeroStat, { label: "Timeline", value: loading ? "..." : "Atualizada", accent: "text-sky-200" }),
         h(HeroStat, { label: "Notas", value: "Sincronizadas", accent: "text-amber-200" })
