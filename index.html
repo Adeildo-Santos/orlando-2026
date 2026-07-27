@@ -781,7 +781,7 @@ function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
                       activity.is_completed ? "bg-emerald-500" : "bg-slate-300"
                     )
                   }),
-                  h(ActivityCard, { activity, onToggleCompleted })
+                  h(ActivityCard, { activity, activities, onToggleCompleted })
                 )
               )
             )
@@ -790,12 +790,14 @@ function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
   );
 }
 
-function ActivityCard({ activity, onToggleCompleted }) {
+function ActivityCard({ activity, activities, onToggleCompleted }) {
   const meta = activityMeta(activity.category);
   const Icon = meta.icon;
-  const mapUrl = activity.latitude && activity.longitude
-    ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
-    : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
+  const routeUrl = (activities || []).filter(a => a.latitude && a.longitude).length > 1
+    ? "https://www.google.com/maps/dir/" + (activities || []).filter(a => a.latitude && a.longitude).map(a => `${a.latitude},${a.longitude}`).join("/") + "/"
+    : activity.latitude && activity.longitude
+      ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
+      : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
 
   return h(
     "article",
@@ -861,7 +863,7 @@ function ActivityCard({ activity, onToggleCompleted }) {
           "Concluída"
         ),
         h("a", {
-          href: mapUrl,
+          href: routeUrl,
           target: "_blank",
           rel: "noreferrer",
           className: "inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
