@@ -838,12 +838,6 @@ function ActivityCard({ activity, onToggleCompleted }) {
             )
           )
         ),
-        activity.address
-          ? h("div", { className: "mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-500" },
-              h(Compass, { className: "h-4 w-4 text-slate-400" }),
-              h("span", { className: "break-words" }, activity.address)
-            )
-          : null,
         activity.notes
           ? h("div", { className: "mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-100" },
               h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400" }, "Notas"),
