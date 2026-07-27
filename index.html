@@ -794,8 +794,8 @@ function ActivityCard({ activity, onToggleCompleted }) {
   const meta = activityMeta(activity.category);
   const Icon = meta.icon;
   const mapUrl = activity.latitude && activity.longitude
-    ? `https://maps.google.com/maps?q=${activity.latitude},${activity.longitude}`
-    : `https://maps.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
+    ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
+    : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
 
   return h(
     "article",
@@ -1092,8 +1092,8 @@ function MapModePanel({ day, activities, onBack }) {
                 ),
                 h("a", {
                   href: activity.latitude && activity.longitude
-                    ? `https://maps.google.com/maps?q=${activity.latitude},${activity.longitude}`
-                    : `https://maps.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`,
+                    ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
+                    : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`,
                   target: "_blank",
                   rel: "noreferrer",
                   className: "mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
