@@ -793,7 +793,9 @@ function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
 function ActivityCard({ activity, onToggleCompleted }) {
   const meta = activityMeta(activity.category);
   const Icon = meta.icon;
-  const mapUrl = `https://maps.google.com/?q=${encodeURIComponent(activity.address || activity.location || activity.title || "")}`;
+  const mapUrl = activity.latitude && activity.longitude
+    ? `https://maps.google.com/maps?q=${activity.latitude},${activity.longitude}`
+    : `https://maps.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
 
   return h(
     "article",
@@ -829,7 +831,7 @@ function ActivityCard({ activity, onToggleCompleted }) {
                 activity.is_completed && "text-slate-500 line-through decoration-2 decoration-emerald-300"
               )
             }, activity.title),
-            h("p", { className: "mt-1 text-sm text-slate-500" }, activity.location || "Local não informado"),
+            h("p", { className: "mt-1 text-sm text-slate-500" }, activity.place_name || "Local não informado"),
             h("div", { className: "mt-3 flex flex-wrap items-center gap-2" },
               h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" }, `${meta.label} • ${formatCurrency(activity.cost || 0)}`),
               activity.is_completed
@@ -898,7 +900,34 @@ function EmptyDayState() {
   );
 }
 
+function buildRouteStops(activities) {
+  const total = activities.length;
+  if (!total) return [];
+  const xStart = 12;
+  const xEnd = 88;
+  const yBase = 26;
+  const yAmplitude = 14;
+  const yDrift = 34;
+
+  return activities.map((activity, index) => {
+    const progress = total === 1 ? 0.5 : index / (total - 1);
+    const x = xStart + (xEnd - xStart) * progress;
+    const wave = Math.sin(progress * Math.PI * 2.25);
+    const y = yBase + wave * yAmplitude + progress * yDrift;
+    return {
+      ...activity,
+      x: Math.max(10, Math.min(90, x)),
+      y: Math.max(12, Math.min(88, y))
+    };
+  });
+}
+
 function MapModePanel({ day, activities, onBack }) {
+  const routeStops = buildRouteStops(activities);
+  const routePath = routeStops.length
+    ? routeStops.map((stop, index) => `${index === 0 ? "M" : "L"} ${stop.x} ${stop.y}`).join(" ")
+    : "";
+
   return h(
     motion.section,
     {
@@ -920,13 +949,32 @@ function MapModePanel({ day, activities, onBack }) {
         className: "inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
       }, h(ChevronLeft, { className: "h-4 w-4" }), "Voltar")
     ),
-    h("div", { className: "mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]" },
+      h("div", { className: "mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]" },
       h("div", { className: "relative min-h-[320px] overflow-hidden rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#effaf8_0%,#f8fafc_45%,#edf7ff_100%)] p-4" },
         h("div", { className: "absolute inset-0 opacity-70", style: {
           backgroundImage:
             "linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)",
           backgroundSize: "44px 44px"
         } }),
+        h("svg", {
+          className: "absolute inset-0 h-full w-full",
+          viewBox: "0 0 100 100",
+          preserveAspectRatio: "none",
+          "aria-hidden": "true"
+        },
+          routePath
+            ? h("path", {
+                d: routePath,
+                fill: "none",
+                stroke: "rgba(16, 185, 129, 0.65)",
+                strokeWidth: "1.7",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeDasharray: "0",
+                filter: "drop-shadow(0 2px 4px rgba(15, 23, 42, 0.12))"
+              })
+            : null
+        ),
         h("div", { className: "relative flex h-full flex-col justify-between" },
           h("div", { className: "flex items-center justify-between" },
             h("div", { className: "rounded-2xl bg-white/80 px-3 py-2 shadow-sm backdrop-blur" },
@@ -936,33 +984,18 @@ function MapModePanel({ day, activities, onBack }) {
             h("div", { className: "rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm" }, "Preview")
           ),
           h("div", { className: "relative mx-auto h-56 w-full max-w-xl" },
-            activities.slice(0, 4).map((activity, index) =>
+            routeStops.map((activity, index) =>
               h("div", {
                 key: activity.id,
-                className: "absolute"
+                className: "absolute",
+                style: { left: `${activity.x}%`, top: `${activity.y}%`, transform: "translate(-50%, -50%)" }
               },
                 h("div", {
                   className: cx(
                     "flex h-12 w-12 items-center justify-center rounded-full border-4 border-white shadow-md",
-                    index === 0 ? "bg-emerald-500" : index === 1 ? "bg-sky-500" : index === 2 ? "bg-amber-500" : "bg-violet-500"
+                    index === 0 ? "bg-emerald-500" : index === 1 ? "bg-sky-500" : index === 2 ? "bg-amber-500" : index % 2 === 0 ? "bg-violet-500" : "bg-indigo-500"
                   ),
-                  style: {
-                    top: `${20 + index * 18}%`,
-                    left: `${14 + index * 18}%`
-                  }
                 }, h(CircleDot, { className: "h-5 w-5 text-white" })),
-                index < activities.slice(0, 4).length - 1
-                  ? h("div", {
-                      className: "absolute h-px bg-slate-300",
-                      style: {
-                        top: `${43 + index * 18}%`,
-                        left: `${20 + index * 18}%`,
-                        width: "72px",
-                        transform: "rotate(24deg)",
-                        transformOrigin: "left center"
-                      }
-                    })
-                  : null
               )
             )
           )
@@ -978,12 +1011,14 @@ function MapModePanel({ day, activities, onBack }) {
                 h("div", { className: "flex items-start justify-between gap-3" },
                   h("div", null,
                     h("p", { className: "text-sm font-semibold text-slate-900" }, activity.title),
-                    h("p", { className: "mt-1 text-xs text-slate-500" }, activity.address || activity.location || "Local não informado")
+                    h("p", { className: "mt-1 text-xs text-slate-500" }, activity.place_name || "Local não informado")
                   ),
                   h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" }, activity.time || "--:--")
                 ),
                 h("a", {
-                  href: `https://maps.google.com/?q=${encodeURIComponent(activity.address || activity.location || activity.title || "")}`,
+                  href: activity.latitude && activity.longitude
+                    ? `https://maps.google.com/maps?q=${activity.latitude},${activity.longitude}`
+                    : `https://maps.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`,
                   target: "_blank",
                   rel: "noreferrer",
                   className: "mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
