@@ -1,456 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0a0a14" />
-  <title>Orlando 2026 — Roteiro de Viagem</title>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { margin: 0; width: 100%; min-height: 100dvh; overflow: hidden; overscroll-behavior: none; background: #06060e; color: #fff; font-family: 'Inter', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-    body { display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); }
-    #root { width: 100%; flex: 1; display: flex; flex-direction: column; }
-
-    .scroll-content { flex: 1; overflow-y: auto; padding: 0 0 120px; max-width: 640px; margin: 0 auto; width: 100%; }
-    .scroll-content::-webkit-scrollbar { width: 3px; }
-    .scroll-content::-webkit-scrollbar-track { background: transparent; }
-    .scroll-content::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.15); border-radius: 99px; }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes scaleIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    @keyframes lineGrow { from { height: 0; } to { height: 100%; } }
-    @keyframes dotPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 0 8px rgba(255,215,0,0); } }
-    @keyframes glow { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-    @keyframes badgePop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes progressGlow { 0% { filter: brightness(1); } 50% { filter: brightness(1.3); } 100% { filter: brightness(1); } }
-
-    .hero-glow { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(78,205,196,0.05) 30%, transparent 70%); pointer-events: none; }
-    .hero-gradient-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to top, #06060e, transparent); pointer-events: none; z-index: 1; }
-    .item-card { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-    .stat-number { font-variant-numeric: tabular-nums; }
-    .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
-
-    .timeline-line { position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: linear-gradient(180deg, rgba(255,215,0,0.3), rgba(255,215,0,0.05)); }
-    .timeline-dot { width: 13px; height: 13px; border-radius: 50%; background: #FFD700; border: 3px solid #06060e; box-shadow: 0 0 0 2px rgba(255,215,0,0.3); flex-shrink: 0; animation: dotPulse 2.5s ease-in-out infinite; position: relative; z-index: 2; }
-
-    .progress-bar { height: 4px; border-radius: 99px; background: rgba(255,255,255,0.05); overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #FFD700, #FF6B6B); transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); animation: progressGlow 2s ease-in-out infinite; }
-
-    .glass-card { background: rgba(255,255,255,0.025); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
-    .glass-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); }
-
-    .day-progress { width: 32px; height: 3px; border-radius: 99px; background: rgba(255,255,255,0.06); overflow: hidden; flex-shrink: 0; }
-    .day-progress-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-
-    .sticky-day-header { position: sticky; top: 0; z-index: 10; background: rgba(6,6,14,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); margin: 0 -20px; padding: 8px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-
-    @media (hover: hover) {
-      .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-      .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a14">
+<title>Orlando 2026</title>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{margin:0;width:100%;min-height:100dvh;overflow:hidden;overscroll-behavior:none;background:#0a0a14;color:#fff;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+#root{width:100%;flex:1;display:flex;flex-direction:column}
+.sc{flex:1;overflow-y:auto;padding:0 20px 120px;max-width:640px;margin:0 auto;width:100%}
+.sc::-webkit-scrollbar{width:3px}
+.sc::-webkit-scrollbar-thumb{background:rgba(255,215,0,.15);border-radius:99px}
+@keyframes si{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.si{animation:si .45s both}
+@keyframes shimmer{0%{background-position:-200%0}100%{background-position:200%0}}
+.sk{background:linear-gradient(90deg,rgba(255,255,255,.03)25%,rgba(255,255,255,.06)50%,rgba(255,255,255,.03)75%);background-size:200%100%;animation:shimmer 1.5s infinite;border-radius:8px}
+.pb{height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.pf{height:100%;border-radius:99px;background:linear-gradient(90deg,#FFD700,#FF6B6B);transition:width .6s}
+</style>
 </head>
-<body>
-  <div id="root"></div>
-  <script>
-    const SUPABASE_URL = "https://dvgpvcqibhrkzsinncyf.supabase.co";
-
-const { useState, useEffect, useMemo, useCallback } = React;
-const { createRoot } = ReactDOM;
-
-const SUPABASE_KEY = (() => {
-  const k = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2Z3B2Y3FpYmhya3pzaW5uY3lmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NDk0MywiZXhwIjoyMDkzODMwOTQzfQ.Rkh4KIx96Go_Nfk7YHkacV5nfjKvdDgHsLHwz_iyaPE";
-  return k;
-})();
-
-const TIPOS = {
-  Restaurantes: { icon: "🍽️", color: "#FF6B6B", bg: "rgba(255,107,107,0.12)" },
-  Eletronicos:  { icon: "💻", color: "#4ECDC4", bg: "rgba(78,205,196,0.12)" },
-  Departamentos:{ icon: "🛍️", color: "#A29BFE", bg: "rgba(162,155,254,0.12)" },
-  Praia:        { icon: "🏖️", color: "#FFEAA7", bg: "rgba(255,234,167,0.12)" },
-  Outlets:      { icon: "🏪", color: "#FF9FF3", bg: "rgba(255,159,243,0.12)" },
-  Hotel:        { icon: "🏨", color: "#FFD700", bg: "rgba(255,215,0,0.12)" },
-  Mercado:      { icon: "🛒", color: "#55E6C1", bg: "rgba(85,230,193,0.12)" },
-  Parques:      { icon: "🎢", color: "#FF6B6B", bg: "rgba(255,107,107,0.12)" },
-};
-
-function fmtData(d) { if (!d) return ""; const [a,m,dd]=d.split("-"); return `${dd}/${m}`; }
-function diaSemana(d) { if(!d)return""; return ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d+"T12:00:00").getDay()]; }
-function nomeDia(d) { if(!d)return""; return ["domingo","segunda","terça","quarta","quinta","sexta","sábado"][new Date(d+"T12:00:00").getDay()]; }
-
-function Confete() {
-  const cores = ["#FFD700","#FF6B6B","#4ECDC4","#A29BFE","#FF9FF3","#55E6C1","#FFEAA7"];
-  return React.createElement("div", { style: { position:"fixed", inset:0, pointerEvents:"none", zIndex:9999, overflow:"hidden" } },
-    Array.from({length:40}).map((_,i) =>
-      React.createElement("div", {
-        key:i,
-        style: {
-          position:"absolute", left: Math.random()*100+"%", top: -10,
-          width: 6+Math.random()*6, height: 6+Math.random()*6,
-          background: cores[i%cores.length],
-          borderRadius: Math.random()>0.5 ? "50%" : "2px",
-          animation: `slideUp ${1.5+Math.random()*2}s ease-in ${Math.random()*0.8}s both`,
-          opacity: 0.8+Math.random()*0.2,
-          transform: `rotate(${Math.random()*360}deg)`
-        }
-      })
-    )
-  );
+<body><div id="root"></div>
+<script>
+const S="https://dvgpvcqibhrkzsinncyf.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2Z3B2Y3FpYmhya3pzaW5uY3lmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NDk0MywiZXhwIjoyMDkzODMwOTQzfQ.Rkh4KIx96Go_Nfk7YHkacV5nfjKvdDgHsLHwz_iyaPE";
+const{useState:e,useEffect:t,useMemo:n}=React,{createRoot:i}=ReactDOM;
+const T={Restaurantes:{ic:"\ud83c\udf7d\ufe0f",co:"#FF6B6B"},Eletronicos:{ic:"\ud83d\udcbb",co:"#4ECDC4"},Departamentos:{ic:"\ud83d\uded1\ufe0f",co:"#A29BFE"},Praia:{ic:"\ud83c\udfd6\ufe0f",co:"#FFEAA7"},Outlets:{ic:"\ud83c\udfaa",co:"#FF9FF3"},Hotel:{ic:"\ud83c\udfe8",co:"#FFD700"},Mercado:{ic:"\ud83d\uded2",co:"#55E6C1"},Parques:{ic:"\ud83c\udfa2",co:"#FF6B6B"}};
+const fd=d=>{if(!d)return"";const[a,_,dd]=d.split("-");return dd+"/"+a};
+const nd=d=>{const o=new Date(d+"T12:00:00");return["dom","seg","ter","qua","qui","sex","sab"][o.getDay()]};
+const _=React.createElement;
+function App(){const[r,s]=e([]),[l,a]=e(1),[f,q]=e("t"),[x,v]=e(null);t(()=>{fetch(S+"/rest/v1/trip?select=*&order=data.asc",{headers:{"apikey":K,Authorization:"Bearer "+K}}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{s(d);a(0)}).catch(()=>{a(0);v("Erro ao carregar")})},[]);
+const g=n(()=>{const g={};r.forEach(r=>{const c=r.data||"x";if(!g[c])g[c]=[];g[c].push(r)});return Object.entries(g).sort(([a],[b])=>a.localeCompare(b))},[r]);
+const p=n(()=>{const g={};r.forEach(r=>g[r.tipo]=(g[r.tipo]||0)+1);return{total:r.length,dias:g.length,tipos:new Set(r.map(r=>r.tipo)).size,top:Object.entries(g).sort((a,b)=>b[1]-a[1])[0]?.[0]}},[r,g]);
+const o=new Date,y=o.getFullYear()+"-"+String(o.getMonth()+1).padStart(2,"0")+"-"+String(o.getDate()).padStart(2,"0"),h=g.findIndex(([d])=>d>=y),m=h>=0?h:g.length,w=g.length>0?Math.round(m/g.length*100):0;
+const u=d=>d===y;
+return _("div",{style:{height:"100dvh",display:"flex",flexDirection:"column",background:"#0a0a14"}},
+_("div",{style:{paddingTop:"calc(24px+env(safe-area-inset-top,0px))",textAlign:"center"}},
+_("div",{style:{position:"absolute",top:-60,left:"50%",transform:"translateX(-50%)",width:350,height:350,borderRadius:"50%",background:"radial-gradient(circle,rgba(255,215,0,.08)0%,transparent 70%)",pointerEvents:"none"}}),
+_("span",{style:{fontSize:10,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"rgba(255,215,0,.5)"}},"Dezembro 2026"),
+_("h1",{style:{fontSize:30,fontWeight:800,marginTop:2,letterSpacing:"-1px"}},"Orlando",_("span",{style:{color:"#FFD700"}}," 2026")),_("p",{style:{fontSize:12,color:"rgba(255,255,255,.3)",marginTop:2}},"15 \u2014 22 de dezembro \u00b7 8 dias"),
+!l&&_("div",{className:"si",style:{display:"flex",gap:6,padding:"14px 0 0",justifyContent:"center"}},[{v:p.total,l:"Paradas",c:"#FFD700"},{v:p.dias,l:"Dias",c:"#4ECDC4"},{v:p.tipos,l:"Categorias",c:"#A29BFE"}].map((s,i)=>_("div",{key:s.l,style:{textAlign:"center",padding:"8px 14px",background:"rgba(255,255,255,.02)",borderRadius:12,border:"1px solid rgba(255,255,255,.04)",minWidth:70}},_("div",{style:{fontSize:17,fontWeight:700,color:s.c}},s.v),_("div",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:"1px",marginTop:1}},s.l))))),
+_("div",{style:{padding:"12px 20px 8px",display:"flex",gap:5,overflowX:"auto",flexShrink:0,scrollbarWidth:"none"}},["t",...new Set(r.map(r=>r.tipo))].filter(Boolean).map(t=>_("button",{key:t,onClick:()=>q(t),style:{padding:"5px 12px",borderRadius:99,border:"1px solid",fontSize:10,fontWeight:600,whiteSpace:"nowrap",cursor:"pointer",fontFamily:"inherit",outline:"none",flexShrink:0,transition:"all .2s",background:f===t?"rgba(255,215,0,.12)":"rgba(255,255,255,.02)",borderColor:f===t?"rgba(255,215,0,.3)":"rgba(255,255,255,.05)",color:f===t?"#FFD700":"rgba(255,255,255,.35)"}},t==="t"?"\ud83d\udccd Todos":(T[t]?.ic||"\ud83d\udccd")+" "+t))),
+_("div",{style:{padding:"0 20px 8px"}},_("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},_("span",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.15)",textTransform:"uppercase",letterSpacing:"1.5px"}},"Dia "+Math.min(m+1,g.length)+" de "+g.length),_("span",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.15)",letterSpacing:".5px"}},r.length+" paradas")),_("div",{className:"pb"},_("div",{className:"pf",style:{width:w+"%"}}))),
+_("div",{className:"sc"},l&&[1,2,3].map(i=>_("div",{key:i,style:{padding:"20px 0"}},_("div",{className:"sk",style:{height:16,width:"35%",marginBottom:12}}),_("div",{className:"sk",style:{height:60}}))),x&&_("div",{style:{textAlign:"center",padding:60,color:"rgba(255,255,255,.3)",fontSize:13}},x),
+!l&&!x&&g.filter(([d,i])=>f==="t"||i.some(x=>x.tipo===f)).map(([data,itens],idx)=>_("div",{key:data,className:"si",style:{animationDelay:idx*.08+"s",marginBottom:6}},_("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",position:"relative"}},idx<g.length-1&&_("div",{style:{position:"absolute",left:5,top:28,bottom:-10,width:1.5,background:"linear-gradient(180deg,rgba(255,215,0,.15),transparent)"}}),_("div",{style:{width:10,height:10,borderRadius:"50%",background:"#FFD700",border:"2px solid #0a0a14",boxShadow:u(data)?"0 0 0 3px rgba(255,215,0,.5),0 0 15px rgba(255,215,0,.2)":"0 0 0 2px rgba(255,215,0,.3)",flexShrink:0}}),_("div",{style:{flex:1}},_("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline"}},_("span",{style:{fontSize:11,fontWeight:600,color:"rgba(255,215,0,.7)"}},nd(data)+", "+fd(data)),_("span",{style:{fontSize:9,color:"rgba(255,255,255,.2)"}},itens.length+(itens.length===1?" parada":" paradas"))))),itens.map((item,i)=>_("div",{key:item.id,className:"si",style:{animationDelay:(idx*.08+i*.06)+"s",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",marginBottom:5,background:"rgba(255,255,255,.02)",borderRadius:12,border:"1px solid rgba(255,255,255,.04)",position:"relative",overflow:"hidden"}},_("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:2.5,background:"linear-gradient(180deg,"+(T[item.tipo]?.co||"rgba(255,255,255,.3)")+","+(T[item.tipo]?.co||"rgba(255,255,255,.3)")+"55)",borderRadius:"0 2px 2px 0"}}),_("div",{style:{width:34,height:34,borderRadius:10,background:(T[item.tipo]?.co||"rgba(255,255,255,.3)")+"18",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}},T[item.tipo]?.ic||"\ud83d\udccd"),_("div",{style:{flex:1,minWidth:0}},_("div",{style:{fontSize:12,fontWeight:600,lineHeight:1.3}},item.objetivo),_("div",{style:{fontSize:9,color:"rgba(255,255,255,.25)",marginTop:1}},item.tipo)),item.endereco&&_("a",{href:"https://maps.google.com/maps?q="+encodeURIComponent(item.endereco),target:"_blank",style:{fontSize:13,textDecoration:"none",opacity:.35,flexShrink:0,transition:"opacity .2s"},title:item.endereco},"\ud83d\uddfa\ufe0f"))))),
+!l&&!x&&g.filter(([d,i])=>f==="t"||i.some(x=>x.tipo===f)).length===0&&_("div",{style:{textAlign:"center",padding:"60px 20px",color:"rgba(255,255,255,.15)",fontSize:13}},"Nenhum local encontrado"),
+_("div",{style:{textAlign:"center",padding:"30px 20px",color:"rgba(255,255,255,.06)",fontSize:9,letterSpacing:"1.5px",textTransform:"uppercase"}},"Orlando 2026")));
 }
-
-function Card({ children, style, delay=0, ...props }) {
-  return React.createElement("div", {
-    className: "item-card",
-    style: { animationDelay: `${delay}s`, ...style },
-    ...props
-  }, children);
-}
-
-function App() {
-  const [registros, setRegistros] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [filtro, setFiltro] = useState("todos");
-  const [showConfete, setShowConfete] = useState(false);
-  const [erro, setErro] = useState(null);
-
-  useEffect(() => {
-    fetch(`${SUPABASE_URL}/rest/v1/trip?select=*&order=data.asc`, {
-      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-    })
-    .then(r => { if(!r.ok) throw new Error("Erro ao carregar"); return r.json(); })
-    .then(data => { setRegistros(data); setCarregando(false); })
-    .catch(e => { setErro(e.message); setCarregando(false); });
-  }, []);
-
-  const grouped = useMemo(() => {
-    const g = {};
-    registros.forEach(r => {
-      const chave = r.data || "sem-data";
-      if(!g[chave]) g[chave] = [];
-      g[chave].push(r);
-    });
-    return Object.entries(g).sort(([a],[b]) => a.localeCompare(b));
-  }, [registros]);
-
-  const tipos = useMemo(() => {
-    const s = new Set(registros.map(r => r.tipo));
-    return ["todos", ...s].filter(Boolean);
-  }, [registros]);
-
-  const filtered = useMemo(() => {
-    if(filtro==="todos") return grouped;
-    return grouped.map(([d,itens]) => [d, itens.filter(i => i.tipo===filtro)]).filter(([_,itens]) => itens.length>0);
-  }, [grouped, filtro]);
-
-  const stats = useMemo(() => {
-    const t = registros.length;
-    const d = grouped.length;
-    const tp = new Set(registros.map(r=>r.tipo)).size;
-    const tiposCount = {};
-    registros.forEach(r => { tiposCount[r.tipo] = (tiposCount[r.tipo]||0)+1; });
-    const topTipo = Object.entries(tiposCount).sort((a,b)=>b[1]-a[1])[0];
-    return { total: t, dias: d, tipos: tp, topTipo: topTipo?.[0] };
-  }, [registros, grouped]);
-
-  // Índice da data atual (para progresso)
-  const hoje = new Date();
-  const dataAtualStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
-  const indiceAtual = grouped.findIndex(([d]) => d >= dataAtualStr);
-  const diaAtual = indiceAtual >= 0 ? indiceAtual : grouped.length;
-  const progresso = grouped.length > 0 ? Math.round((diaAtual / grouped.length) * 100) : 0;
-
-  // Função para verificar se uma data é hoje
-  function isHoje(data) { return data === dataAtualStr; }
-
-  return React.createElement("div", { style: { height:"100dvh", display:"flex", flexDirection:"column", background:"#06060e"} },
-
-    showConfete && React.createElement(Confete, null),
-
-    // === HERO ===
-    React.createElement("div", { style: { position:"relative", overflow:"hidden", paddingTop:"calc(28px + env(safe-area-inset-top,0px))", background:"linear-gradient(180deg, rgba(255,215,0,0.03) 0%, transparent 100%)" } },
-      React.createElement("div", { className:"hero-glow" }),
-      React.createElement("div", { className:"hero-gradient-bottom" }),
-
-      // Trip badge
-      React.createElement("div", { style: { padding:"0 24px", textAlign:"center", position:"relative", zIndex:2 } },
-        React.createElement("div", {
-          className: "item-card",
-          style: { animationDelay:"0s", display:"inline-flex", alignItems:"center", gap:4,
-            padding:"3px 12px 3px 8px", borderRadius:99,
-            background:"rgba(255,215,0,0.08)", border:"1px solid rgba(255,215,0,0.12)", marginBottom:10
-          }
-        },
-          React.createElement("span", { style: { fontSize:10 } }, "✈️"),
-          React.createElement("span", { style: { fontSize:10, fontWeight:600, color:"rgba(255,215,0,0.7)", letterSpacing:"1.2px", textTransform:"uppercase" } }, "Dezembro 2026")
-        ),
-        React.createElement("h1", { className:"item-card", style: { animationDelay:"0.06s", fontSize:34, fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.1 } },
-          "Orlando ", React.createElement("span", { style: { background:"linear-gradient(135deg, #FFD700, #FFB800)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" } }, "2026")
-        ),
-        React.createElement("p", { className:"item-card", style: { animationDelay:"0.1s", fontSize:12, color:"rgba(255,255,255,0.3)", fontWeight:400, marginTop:4, letterSpacing:"0.3px" } },
-          "15 — 22 de dezembro · ", React.createElement("strong", { style: { color:"rgba(255,255,255,0.5)" } }, "8 dias de aventura")
-        ),
-      ),
-
-      // === STATS ROW ===
-      !carregando && React.createElement("div", {
-        className:"item-card", style: { animationDelay:"0.15s", marginTop:20, marginLeft:16, marginRight:16, padding:12, background:"rgba(255,255,255,0.02)", borderRadius:14, border:"1px solid rgba(255,255,255,0.04)" }
-      },
-        React.createElement("div", { style: { display:"flex", alignItems:"center", gap:10 } },
-          // Progress circle
-          React.createElement("div", { style: { position:"relative", width:44, height:44, flexShrink:0 } },
-            React.createElement("svg", { width:44, height:44, viewBox:"0 0 44 44", style: { transform:"rotate(-90deg)" } },
-              React.createElement("circle", { cx:22, cy:22, r:18, fill:"none", stroke:"rgba(255,255,255,0.06)", strokeWidth:3.5 }),
-              React.createElement("circle", { cx:22, cy:22, r:18, fill:"none", stroke:"url(#progressGrad)", strokeWidth:3.5,
-                strokeDasharray: `${2*Math.PI*18}`, strokeDashoffset: `${2*Math.PI*18*(1-progresso/100)}`,
-                strokeLinecap:"round", style: { transition:"stroke-dashoffset 1s cubic-bezier(0.16,1,0.3,1)" }
-              })
-            ),
-            React.createElement("svg", { style: { position:"absolute", top:0, left:0, width:0, height:0 } },
-              React.createElement("defs", null,
-                React.createElement("linearGradient", { id:"progressGrad", x1:"0%", y1:"0%", x2:"100%", y2:"0%" },
-                  React.createElement("stop", { offset:"0%", stopColor:"#FFD700" }),
-                  React.createElement("stop", { offset:"100%", stopColor:"#FF6B6B" })
-                )
-              )
-            ),
-            React.createElement("div", { style: { position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color:"rgba(255,215,0,0.8)" } },
-              `${progresso}%`
-            )
-          ),
-          // Stats
-          React.createElement("div", { style: { flex:1, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:0 } },
-            [
-              { label:"Paradas", value:stats.total, color:"#FFD700" },
-              { label:"Dias", value:stats.dias, color:"#4ECDC4" },
-              { label:"Categorias", value:stats.tipos, color:"#A29BFE" },
-            ].map(s =>
-              React.createElement("div", { key:s.label, style: { textAlign:"center" } },
-                React.createElement("div", { style: { fontSize:15, fontWeight:800, color:s.color } }, s.value),
-                React.createElement("div", { style: { fontSize:8, fontWeight:600, color:"rgba(255,255,255,0.2)", marginTop:1, textTransform:"uppercase", letterSpacing:"1px" } }, s.label)
-              )
-            )
-          ),
-          // Top category badge
-          stats.topTipo && React.createElement("div", { style: { textAlign:"center", paddingLeft:8, borderLeft:"1px solid rgba(255,255,255,0.06)", flexShrink:0 } },
-            React.createElement("div", { style: { fontSize:16 } }, TIPOS[stats.topTipo]?.icon || "📍"),
-            React.createElement("div", { style: { fontSize:7, fontWeight:600, color:"rgba(255,255,255,0.15)", marginTop:2, textTransform:"uppercase", letterSpacing:"0.5px" } }, "Top")
-          )
-        )
-      ),
-
-      carregando && React.createElement("div", { style: { margin:"20px 16px 0", height:68 } },
-        React.createElement("div", { className:"skeleton", style: { width:"100%", height:"100%", borderRadius:14 } })
-      ),
-
-      // === PROGRESS BAR ===
-      !carregando && React.createElement("div", { className:"item-card", style: { animationDelay:"0.18s", padding:"8px 24px 4px", position:"relative", zIndex:2 } },
-        React.createElement("div", { style: { display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 } },
-          React.createElement("span", { style: { fontSize:9, fontWeight:600, color:"rgba(255,255,255,0.15"), textTransform:"uppercase", letterSpacing:"1.5px" } },
-            `Dia ${Math.min(diaAtual+1, stats.dias)} de ${stats.dias}`
-          ),
-          React.createElement("span", { style: { fontSize:9, fontWeight:600, color:"rgba(255,255,255,0.15"), letterSpacing:"0.5px" } },
-            `${registros.length} paradas`
-          )
-        ),
-        React.createElement("div", { className:"progress-bar" },
-          React.createElement("div", { className:"progress-fill", style: { width:`${progresso}%` } })
-        )
-      ),
-    ),
-
-    // === FILTROS ===
-    React.createElement("div", { style: { padding:"14px 20px 10px", flexShrink:0, position:"relative", zIndex:2 } },
-      React.createElement("div", { style: { display:"flex", gap:5, overflowX:"auto", flexShrink:0, scrollbarWidth:"none" } },
-        tipos.map((t, i) =>
-          React.createElement("button", {
-            key:t, onClick:()=>setFiltro(t), className:"item-card",
-            style: {
-              padding:"5px 12px", borderRadius:99, border:"1px solid", fontSize:10, fontWeight:600,
-              whiteSpace:"nowrap", cursor:"pointer", fontFamily:"inherit", outline:"none", flexShrink:0,
-              transition:"all 0.3s cubic-bezier(0.16,1,0.3,1)",
-              background: filtro===t ? "rgba(255,215,0,0.12)" : "rgba(255,255,255,0.02)",
-              borderColor: filtro===t ? "rgba(255,215,0,0.3)" : "rgba(255,255,255,0.05)",
-              color: filtro===t ? "#FFD700" : "rgba(255,255,255,0.35)",
-              animationDelay:`${i*0.04}s`,
-            }
-          }, t==="todos" ? "📍 Todos" : `${TIPOS[t]?.icon||"📍"} ${t}`)
-        )
-      )
-    ),
-
-    // === CONTEÚDO ===
-    React.createElement("div", { className:"scroll-content", style: { position:"relative", zIndex:1 } },
-
-      carregando && Array.from({length:5}).map((_,i) =>
-        React.createElement("div", { key:i, style: { padding:"24px 24px" } },
-          React.createElement("div", { className:"skeleton", style: { height:16, width:"35%", borderRadius:6, marginBottom:14 } }),
-          React.createElement("div", { className:"skeleton", style: { height:64, borderRadius:12, marginBottom:8 } }),
-          React.createElement("div", { className:"skeleton", style: { height:64, borderRadius:12, marginBottom:8 } }),
-          React.createElement("div", { className:"skeleton", style: { height:64, borderRadius:12 } }),
-        )
-      ),
-
-      erro && React.createElement("div", { style: { textAlign:"center", padding:60, color:"rgba(255,255,255,0.3)" } },
-        React.createElement("div", { style: { fontSize:32, marginBottom:12 } }, "⚠️"),
-        React.createElement("div", { style: { fontSize:13 } }, erro)
-      ),
-
-      // Timeline profissional
-      !carregando && !erro && filtered.length > 0 &&
-        React.createElement("div", { style: { padding:"0 20px" } },
-          filtered.map(([data, itens], idx) => {
-            const hojeEhEsteDia = isHoje(data);
-            return React.createElement("div", {
-              key:data, className:"item-card",
-              style: { animationDelay:`${idx*0.08}s`, position:"relative", paddingLeft:0, marginBottom:8 }
-            },
-              // Timeline connector line
-              idx < filtered.length-1 && React.createElement("div", {
-                style: { position:"absolute", left:20, top:52, bottom:-8, width:2,
-                  background:"linear-gradient(180deg, rgba(255,215,0,0.15), rgba(255,215,0,0.02))",
-                  zIndex:1
-                }
-              }),
-
-              // Day header — sticky
-              React.createElement("div", { className:"sticky-day-header", style: { animationDelay:`${idx*0.08}s` } },
-                React.createElement("div", { style: { display:"flex", alignItems:"center", gap:12 } },
-                  React.createElement("div", { style: { position:"relative", display:"flex", alignItems:"center", justifyContent:"center", width:40, height:40, flexShrink:0 } },
-                    // Glow when it's today
-                    hojeEhEsteDia && React.createElement("div", { style: { position:"absolute", width:40, height:40, borderRadius:"50%", background:"rgba(255,215,0,0.1)", animation:"glow 2s ease-in-out infinite" } }),
-                    React.createElement("div", { className:"timeline-dot", style: hojeEhEsteDia ? { boxShadow:"0 0 0 3px rgba(255,215,0,0.5), 0 0 20px rgba(255,215,0,0.2)" } : {} }),
-                  ),
-                  React.createElement("div", { style: { flex:1, display:"flex", justifyContent:"space-between", alignItems:"center" } },
-                    React.createElement("div", null,
-                      React.createElement("div", { style: { display:"flex", alignItems:"center", gap:6 } },
-                        React.createElement("span", { style: { fontSize:14, fontWeight:700, letterSpacing:"-0.3px" } },
-                          `${nomeDia(data)}, ${fmtData(data)}`
-                        ),
-                        hojeEhEsteDia && React.createElement("span", {
-                          style: { fontSize:9, fontWeight:700, padding:"1px 7px", borderRadius:99,
-                            background:"rgba(255,215,0,0.15)", color:"#FFD700",
-                            letterSpacing:"0.5px", textTransform:"uppercase" }
-                        }, "Hoje")
-                      ),
-                      React.createElement("div", { style: { fontSize:10, color:"rgba(255,255,255,0.15)", marginTop:1, fontWeight:500 } },
-                        `${itens.length} ${itens.length===1?"parada":"paradas"} no roteiro`
-                      )
-                    ),
-                    // Progress pill
-                    React.createElement("div", { style: { display:"flex", alignItems:"center", gap:6 } },
-                      React.createElement("div", { className:"day-progress" },
-                        React.createElement("div", { className:"day-progress-fill", style: { width:`${Math.min(100, (itens.filter(i=>i.concluido).length/itens.length)*100)}%`, background:"linear-gradient(90deg, #FFD700, #FFB800)" } })
-                      ),
-                      React.createElement("span", { style: { fontSize:9, color:"rgba(255,255,255,0.12)", fontWeight:500 } },
-                        itens.length
-                      )
-                    )
-                  )
-                )
-              ),
-
-              // Items
-              React.createElement("div", { style: { paddingTop:6, paddingBottom:8 } },
-                itens.map((item, i) => {
-                  const tipo = TIPOS[item.tipo] || { icon:"📍", color:"rgba(255,255,255,0.3)", bg:"rgba(255,255,255,0.03)" };
-                  const cor = tipo.color;
-                  const bg = tipo.bg;
-                  return React.createElement("div", {
-                    key:item.id,
-                    className: `item-card ${"hover-lift"}`,
-                    style: {
-                      animationDelay:`${idx*0.08 + i*0.06}s`,
-                      marginBottom:6,
-                      background: "rgba(255,255,255,0.02)",
-                      borderRadius:14,
-                      border:"1px solid rgba(255,255,255,0.04)",
-                      overflow:"hidden",
-                      position:"relative",
-                      transition:"all 0.25s cubic-bezier(0.16,1,0.3,1)",
-                    }
-                  },
-                    // Left color accent bar
-                    React.createElement("div", { style: { position:"absolute", left:0, top:0, bottom:0, width:3, background:`linear-gradient(180deg, ${cor}, ${cor}88)`, borderRadius:"0 2px 2px 0" } }),
-                    React.createElement("div", { style: { display:"flex", alignItems:"center", gap:10, padding:"11px 12px 11px 18px" } },
-                      // Icon container
-                      React.createElement("div", {
-                        style: {
-                          width:38, height:38, borderRadius:12,
-                          background: bg,
-                          display:"flex", alignItems:"center", justifyContent:"center",
-                          fontSize:16, flexShrink:0,
-                          border:"1px solid " + cor.replace(")", ",0.08)").replace("rgb","rgba").replace("0.12","0.08"),
-                        }
-                      }, tipo.icon),
-                      // Content
-                      React.createElement("div", { style: { flex:1, minWidth:0 } },
-                        React.createElement("div", {
-                          style: {
-                            fontSize:13, fontWeight:600, lineHeight:1.3,
-                            display:"flex", alignItems:"center", gap:6,
-                            flexWrap:"wrap"
-                          }
-                        },
-                          React.createElement("span", null, item.objetivo),
-                          React.createElement("span", { style: { fontSize:9, fontWeight:500, padding:"1px 6px", borderRadius:6,
-                            background: bg, color: cor, border:"1px solid "+cor.replace(")", ",0.12)").replace("rgb","rgba").replace("0.12","0.08"),
-                            whiteSpace:"nowrap"
-                          } }, item.tipo)
-                        ),
-                        item.endereco && React.createElement("div", { style: { fontSize:10, color:"rgba(255,255,255,0.15)", marginTop:2, display:"flex", alignItems:"center", gap:4 } },
-                          React.createElement("span", { style: { opacity:0.4 } }, "📍"),
-                          React.createElement("span", { style: { overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:200 } }, item.endereco)
-                        )
-                      ),
-                      // Map link
-                      item.endereco && React.createElement("a", {
-                        href:`https://maps.google.com/maps?q=${encodeURIComponent(item.endereco)}`,
-                        target:"_blank",
-                        style: {
-                          width:32, height:32, borderRadius:10,
-                          display:"flex", alignItems:"center", justifyContent:"center",
-                          background:"rgba(255,255,255,0.03)", textDecoration:"none",
-                          fontSize:12, flexShrink:0,
-                          transition:"all 0.2s",
-                          border:"1px solid rgba(255,255,255,0.04)",
-                          color:"rgba(255,255,255,0.3)",
-                        },
-                        title: item.endereco
-                      }, "🗺️")
-                    )
-                  );
-                })
-              )
-            );
-          })
-        ),
-
-      !carregando && !erro && filtered.length===0 &&
-        React.createElement("div", { style: { textAlign:"center", padding:"80px 20px", color:"rgba(255,255,255,0.15)" } },
-          React.createElement("div", { style: { fontSize:36, marginBottom:12, opacity:0.5 } }, "🔍"),
-          React.createElement("div", { style: { fontSize:14, fontWeight:500, color:"rgba(255,255,255,0.25)", marginBottom:4 } }, "Nenhum local encontrado"),
-          React.createElement("div", { style: { fontSize:11, color:"rgba(255,255,255,0.1)" } }, "Tente selecionar outra categoria")
-        ),
-
-      // Footer
-      !carregando && !erro && React.createElement("div", { style: { textAlign:"center", padding:"40px 20px 48px", color:"rgba(255,255,255,0.08)", fontSize:10, fontWeight:500, letterSpacing:"1.5px", textTransform:"uppercase" } },
-        React.createElement("div", { style: { marginBottom:4, fontSize:16 } }, "🏰"),
-        React.createElement("span", null, "Orlando 2026")
-      )
-    )
-  );
-}
-
-const root = createRoot(document.getElementById("root"));
-root.render(React.createElement(App));
-  </script>
-</body>
-</html>
+i(document.getElementById("root")).render(_(App));
+</script></body></html>
