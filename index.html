@@ -868,7 +868,7 @@ function ActivityCard({ activity, activities, onToggleCompleted }) {
           rel: "noreferrer",
           className: "inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
         },
-          "Abrir no mapa",
+          "Abrir mapa",
           h(ExternalLink, { className: "h-4 w-4" })
         )
       )
@@ -1099,7 +1099,7 @@ function MapModePanel({ day, activities, onBack }) {
                   target: "_blank",
                   rel: "noreferrer",
                   className: "mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
-                }, "Abrir no mapa", h(ExternalLink, { className: "h-4 w-4" }))
+                }, "Abrir mapa", h(ExternalLink, { className: "h-4 w-4" }))
               )
             )
           : h(EmptyDayState, null)
