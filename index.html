@@ -5,52 +5,1064 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a14">
-<title>Orlando 2026</title>
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0f766e">
+<title>Itinerary View</title>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1?dev",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime?dev",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?dev"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./tailwind.generated.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{margin:0;width:100%;min-height:100dvh;overflow:hidden;overscroll-behavior:none;background:#0a0a14;color:#fff;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-body{display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
-#root{width:100%;flex:1;display:flex;flex-direction:column}
-.sc{flex:1;overflow-y:auto;padding:0 20px 120px;max-width:640px;margin:0 auto;width:100%}
-.sc::-webkit-scrollbar{width:3px}
-.sc::-webkit-scrollbar-thumb{background:rgba(255,215,0,.15);border-radius:99px}
-@keyframes si{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.si{animation:si .45s both}
-@keyframes shimmer{0%{background-position:-200%0}100%{background-position:200%0}}
-.sk{background:linear-gradient(90deg,rgba(255,255,255,.03)25%,rgba(255,255,255,.06)50%,rgba(255,255,255,.03)75%);background-size:200%100%;animation:shimmer 1.5s infinite;border-radius:8px}
-.pb{height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
-.pf{height:100%;border-radius:99px;background:linear-gradient(90deg,#FFD700,#FF6B6B);transition:width .6s}
+  html, body, #root {
+    min-height: 100%;
+  }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at top left, rgba(16, 185, 129, 0.10), transparent 26%),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 24%),
+      #f8fafc;
+    color: #0f172a;
+    font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 </head>
-<body><div id="root"></div>
-<script>
-const S="https://dvgpvcqibhrkzsinncyf.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2Z3B2Y3FpYmhya3pzaW5uY3lmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NDk0MywiZXhwIjoyMDkzODMwOTQzfQ.Rkh4KIx96Go_Nfk7YHkacV5nfjKvdDgHsLHwz_iyaPE";
-const{useState:e,useEffect:t,useMemo:n}=React,{createRoot:i}=ReactDOM;
-const T={Restaurantes:{ic:"\ud83c\udf7d\ufe0f",co:"#FF6B6B"},Eletronicos:{ic:"\ud83d\udcbb",co:"#4ECDC4"},Departamentos:{ic:"\ud83d\uded1\ufe0f",co:"#A29BFE"},Praia:{ic:"\ud83c\udfd6\ufe0f",co:"#FFEAA7"},Outlets:{ic:"\ud83c\udfaa",co:"#FF9FF3"},Hotel:{ic:"\ud83c\udfe8",co:"#FFD700"},Mercado:{ic:"\ud83d\uded2",co:"#55E6C1"},Parques:{ic:"\ud83c\udfa2",co:"#FF6B6B"}};
-const fd=d=>{if(!d)return"";const[a,_,dd]=d.split("-");return dd+"/"+a};
-const nd=d=>{const o=new Date(d+"T12:00:00");return["dom","seg","ter","qua","qui","sex","sab"][o.getDay()]};
-const _=React.createElement;
-function App(){const[r,s]=e([]),[l,a]=e(1),[f,q]=e("t"),[x,v]=e(null);t(()=>{fetch(S+"/rest/v1/trip?select=*&order=data.asc",{headers:{"apikey":K,Authorization:"Bearer "+K}}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{s(d);a(0)}).catch(()=>{a(0);v("Erro ao carregar")})},[]);
-const g=n(()=>{const g={};r.forEach(r=>{const c=r.data||"x";if(!g[c])g[c]=[];g[c].push(r)});return Object.entries(g).sort(([a],[b])=>a.localeCompare(b))},[r]);
-const p=n(()=>{const g={};r.forEach(r=>g[r.tipo]=(g[r.tipo]||0)+1);return{total:r.length,dias:g.length,tipos:new Set(r.map(r=>r.tipo)).size,top:Object.entries(g).sort((a,b)=>b[1]-a[1])[0]?.[0]}},[r,g]);
-const o=new Date,y=o.getFullYear()+"-"+String(o.getMonth()+1).padStart(2,"0")+"-"+String(o.getDate()).padStart(2,"0"),h=g.findIndex(([d])=>d>=y),m=h>=0?h:g.length,w=g.length>0?Math.round(m/g.length*100):0;
-const u=d=>d===y;
-return _("div",{style:{height:"100dvh",display:"flex",flexDirection:"column",background:"#0a0a14"}},
-_("div",{style:{paddingTop:"calc(24px+env(safe-area-inset-top,0px))",textAlign:"center"}},
-_("div",{style:{position:"absolute",top:-60,left:"50%",transform:"translateX(-50%)",width:350,height:350,borderRadius:"50%",background:"radial-gradient(circle,rgba(255,215,0,.08)0%,transparent 70%)",pointerEvents:"none"}}),
-_("span",{style:{fontSize:10,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"rgba(255,215,0,.5)"}},"Dezembro 2026"),
-_("h1",{style:{fontSize:30,fontWeight:800,marginTop:2,letterSpacing:"-1px"}},"Orlando",_("span",{style:{color:"#FFD700"}}," 2026")),_("p",{style:{fontSize:12,color:"rgba(255,255,255,.3)",marginTop:2}},"15 \u2014 22 de dezembro \u00b7 8 dias"),
-!l&&_("div",{className:"si",style:{display:"flex",gap:6,padding:"14px 0 0",justifyContent:"center"}},[{v:p.total,l:"Paradas",c:"#FFD700"},{v:p.dias,l:"Dias",c:"#4ECDC4"},{v:p.tipos,l:"Categorias",c:"#A29BFE"}].map((s,i)=>_("div",{key:s.l,style:{textAlign:"center",padding:"8px 14px",background:"rgba(255,255,255,.02)",borderRadius:12,border:"1px solid rgba(255,255,255,.04)",minWidth:70}},_("div",{style:{fontSize:17,fontWeight:700,color:s.c}},s.v),_("div",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:"1px",marginTop:1}},s.l))))),
-_("div",{style:{padding:"12px 20px 8px",display:"flex",gap:5,overflowX:"auto",flexShrink:0,scrollbarWidth:"none"}},["t",...new Set(r.map(r=>r.tipo))].filter(Boolean).map(t=>_("button",{key:t,onClick:()=>q(t),style:{padding:"5px 12px",borderRadius:99,border:"1px solid",fontSize:10,fontWeight:600,whiteSpace:"nowrap",cursor:"pointer",fontFamily:"inherit",outline:"none",flexShrink:0,transition:"all .2s",background:f===t?"rgba(255,215,0,.12)":"rgba(255,255,255,.02)",borderColor:f===t?"rgba(255,215,0,.3)":"rgba(255,255,255,.05)",color:f===t?"#FFD700":"rgba(255,255,255,.35)"}},t==="t"?"\ud83d\udccd Todos":(T[t]?.ic||"\ud83d\udccd")+" "+t))),
-_("div",{style:{padding:"0 20px 8px"}},_("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},_("span",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.15)",textTransform:"uppercase",letterSpacing:"1.5px"}},"Dia "+Math.min(m+1,g.length)+" de "+g.length),_("span",{style:{fontSize:8,fontWeight:600,color:"rgba(255,255,255,.15)",letterSpacing:".5px"}},r.length+" paradas")),_("div",{className:"pb"},_("div",{className:"pf",style:{width:w+"%"}}))),
-_("div",{className:"sc"},l&&[1,2,3].map(i=>_("div",{key:i,style:{padding:"20px 0"}},_("div",{className:"sk",style:{height:16,width:"35%",marginBottom:12}}),_("div",{className:"sk",style:{height:60}}))),x&&_("div",{style:{textAlign:"center",padding:60,color:"rgba(255,255,255,.3)",fontSize:13}},x),
-!l&&!x&&g.filter(([d,i])=>f==="t"||i.some(x=>x.tipo===f)).map(([data,itens],idx)=>_("div",{key:data,className:"si",style:{animationDelay:idx*.08+"s",marginBottom:6}},_("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",position:"relative"}},idx<g.length-1&&_("div",{style:{position:"absolute",left:5,top:28,bottom:-10,width:1.5,background:"linear-gradient(180deg,rgba(255,215,0,.15),transparent)"}}),_("div",{style:{width:10,height:10,borderRadius:"50%",background:"#FFD700",border:"2px solid #0a0a14",boxShadow:u(data)?"0 0 0 3px rgba(255,215,0,.5),0 0 15px rgba(255,215,0,.2)":"0 0 0 2px rgba(255,215,0,.3)",flexShrink:0}}),_("div",{style:{flex:1}},_("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline"}},_("span",{style:{fontSize:11,fontWeight:600,color:"rgba(255,215,0,.7)"}},nd(data)+", "+fd(data)),_("span",{style:{fontSize:9,color:"rgba(255,255,255,.2)"}},itens.length+(itens.length===1?" parada":" paradas"))))),itens.map((item,i)=>_("div",{key:item.id,className:"si",style:{animationDelay:(idx*.08+i*.06)+"s",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",marginBottom:5,background:"rgba(255,255,255,.02)",borderRadius:12,border:"1px solid rgba(255,255,255,.04)",position:"relative",overflow:"hidden"}},_("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:2.5,background:"linear-gradient(180deg,"+(T[item.tipo]?.co||"rgba(255,255,255,.3)")+","+(T[item.tipo]?.co||"rgba(255,255,255,.3)")+"55)",borderRadius:"0 2px 2px 0"}}),_("div",{style:{width:34,height:34,borderRadius:10,background:(T[item.tipo]?.co||"rgba(255,255,255,.3)")+"18",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}},T[item.tipo]?.ic||"\ud83d\udccd"),_("div",{style:{flex:1,minWidth:0}},_("div",{style:{fontSize:12,fontWeight:600,lineHeight:1.3}},item.objetivo),_("div",{style:{fontSize:9,color:"rgba(255,255,255,.25)",marginTop:1}},item.tipo)),item.endereco&&_("a",{href:"https://maps.google.com/maps?q="+encodeURIComponent(item.endereco),target:"_blank",style:{fontSize:13,textDecoration:"none",opacity:.35,flexShrink:0,transition:"opacity .2s"},title:item.endereco},"\ud83d\uddfa\ufe0f"))))),
-!l&&!x&&g.filter(([d,i])=>f==="t"||i.some(x=>x.tipo===f)).length===0&&_("div",{style:{textAlign:"center",padding:"60px 20px",color:"rgba(255,255,255,.15)",fontSize:13}},"Nenhum local encontrado"),
-_("div",{style:{textAlign:"center",padding:"30px 20px",color:"rgba(255,255,255,.06)",fontSize:9,letterSpacing:"1.5px",textTransform:"uppercase"}},"Orlando 2026")));
+<body>
+<div id="root"></div>
+
+<script type="module">
+import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18.3.1?dev";
+import { createRoot } from "https://esm.sh/react-dom@18.3.1/client?dev";
+import { AnimatePresence, motion } from "https://esm.sh/framer-motion@11.13.1?dev&external=react";
+import {
+  BadgeCheck,
+  BedDouble,
+  CalendarDays,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleDot,
+  Clock3,
+  CarFront,
+  Compass,
+  Edit3,
+  ExternalLink,
+  Globe2,
+  Landmark,
+  MapPinned,
+  Pencil,
+  Share2,
+  Sparkles,
+  Star,
+  UtensilsCrossed,
+  Users
+} from "https://esm.sh/lucide-react@0.460.0?dev&external=react";
+
+const h = React.createElement;
+const Fragment = React.Fragment;
+const DEMO_TRIP_ID = "orlando-2026-demo";
+const SUPABASE_URL = window.__SUPABASE_URL__ || "";
+const SUPABASE_ANON_KEY = window.__SUPABASE_ANON_KEY__ || "";
+const SUPABASE_TRIP_ID = window.__SUPABASE_TRIP_ID__ || DEMO_TRIP_ID;
+const DEFAULT_COVER_IMAGE = "./orlando-cover.jpg";
+
+const resolveCoverImage = (value) => {
+  const src = String(value || "").trim();
+  return src ? src : DEFAULT_COVER_IMAGE;
+};
+
+const demoData = {
+  trip: {
+    id: DEMO_TRIP_ID,
+    title: "Viagem para Orlando",
+    destination: "Orlando, Flórida",
+    start_date: "2026-12-15",
+    end_date: "2026-12-22",
+    cover_image_url: DEFAULT_COVER_IMAGE
+  },
+  days: [
+    { id: "day-1", trip_id: DEMO_TRIP_ID, day_number: 1, date: "2026-12-15", summary: "Chegada, locação do carro e check-in" },
+    { id: "day-2", trip_id: DEMO_TRIP_ID, day_number: 2, date: "2026-12-16", summary: "Magic Kingdom, jantar e fogos" },
+    { id: "day-3", trip_id: DEMO_TRIP_ID, day_number: 3, date: "2026-12-17", summary: "Universal Studios e CityWalk" },
+    { id: "day-4", trip_id: DEMO_TRIP_ID, day_number: 4, date: "2026-12-18", summary: "Outlets, Disney Springs e compras" },
+    { id: "day-5", trip_id: DEMO_TRIP_ID, day_number: 5, date: "2026-12-19", summary: "Animal Kingdom e jantar no resort" }
+  ],
+  activities: [
+    {
+      id: "a-1",
+      day_id: "day-1",
+      time: "09:00",
+      duration_minutes: 90,
+      title: "Transfer do aeroporto para o hotel",
+      category: "Transporte",
+      location: "Orlando International Airport",
+      address: "1 Jeff Fuqua Blvd, Orlando, FL",
+      cost: 58,
+      notes: "Confirmar retirada do carro alugado no desembarque.",
+      is_completed: true
+    },
+    {
+      id: "a-2",
+      day_id: "day-1",
+      time: "14:00",
+      duration_minutes: 120,
+      title: "Check-in no resort",
+      category: "Hospedagem",
+      location: "Disney's Pop Century Resort",
+      address: "1050 Century Dr, Lake Buena Vista, FL",
+      cost: 0,
+      notes: "Solicitar early check-in e guardar o Genie+ do dia.",
+      is_completed: true
+    },
+    {
+      id: "a-3",
+      day_id: "day-1",
+      time: "19:30",
+      duration_minutes: 150,
+      title: "Jantar no Disney Springs",
+      category: "Restaurante",
+      location: "The Boathouse",
+      address: "1620 E Buena Vista Dr, Lake Buena Vista, FL",
+      cost: 84,
+      notes: "Bom para começar a viagem com um jantar mais leve.",
+      is_completed: false
+    },
+    {
+      id: "a-4",
+      day_id: "day-2",
+      time: "09:00",
+      duration_minutes: 150,
+      title: "Magic Kingdom",
+      category: "Ponto turístico",
+      location: "Walt Disney World",
+      address: "1180 Seven Seas Dr, Lake Buena Vista, FL",
+      cost: 189,
+      notes: "Comprar ingresso e chegar antes da abertura do parque.",
+      is_completed: true
+    },
+    {
+      id: "a-5",
+      day_id: "day-2",
+      time: "13:00",
+      duration_minutes: 75,
+      title: "Almoço rápido no parque",
+      category: "Restaurante",
+      location: "Columbia Harbour House",
+      address: "Magic Kingdom, Orlando, FL",
+      cost: 36,
+      notes: "Pausa curta para não perder as atrações principais.",
+      is_completed: false
+    },
+    {
+      id: "a-6",
+      day_id: "day-2",
+      time: "18:00",
+      duration_minutes: 90,
+      title: "Show noturno e fogos",
+      category: "Passeio",
+      location: "Main Street, U.S.A.",
+      address: "Magic Kingdom, Orlando, FL",
+      cost: 0,
+      notes: "Escolher um bom ponto para assistir ao encerramento do dia.",
+      is_completed: false
+    },
+    {
+      id: "a-7",
+      day_id: "day-3",
+      time: "08:00",
+      duration_minutes: 240,
+      title: "Universal Studios Orlando",
+      category: "Transporte",
+      location: "Universal Orlando Resort",
+      address: "6000 Universal Blvd, Orlando, FL",
+      cost: 199,
+      notes: "Separar roupa leve e capa de chuva para as filas externas.",
+      is_completed: false
+    },
+    {
+      id: "a-8",
+      day_id: "day-3",
+      time: "12:30",
+      duration_minutes: 120,
+      title: "Almoço no CityWalk",
+      category: "Restaurante",
+      location: "Margaritaville",
+      address: "Universal CityWalk, Orlando, FL",
+      cost: 52,
+      notes: "Ótima pausa entre atrações e compras de souvenirs.",
+      is_completed: false
+    },
+    {
+      id: "a-9",
+      day_id: "day-4",
+      time: "10:00",
+      duration_minutes: 110,
+      title: "Orlando International Premium Outlets",
+      category: "Passeio",
+      location: "Premium Outlets",
+      address: "4951 International Dr, Orlando, FL",
+      cost: 0,
+      notes: "Separar tempo para compras de roupas e eletrônicos.",
+      is_completed: false
+    },
+    {
+      id: "a-10",
+      day_id: "day-4",
+      time: "19:00",
+      duration_minutes: 120,
+      title: "Disney Springs",
+      category: "Passeio",
+      location: "Disney Springs",
+      address: "1486 Buena Vista Dr, Lake Buena Vista, FL",
+      cost: 28,
+      notes: "Reservar tempo para caminhar e comprar presentes.",
+      is_completed: false
+    },
+    {
+      id: "a-11",
+      day_id: "day-5",
+      time: "09:00",
+      duration_minutes: 180,
+      title: "Animal Kingdom",
+      category: "Ponto turístico",
+      location: "Disney's Animal Kingdom",
+      address: "2901 Osceola Pkwy, Bay Lake, FL",
+      cost: 179,
+      notes: "Programar a visita ao Safari logo cedo.",
+      is_completed: false
+    },
+    {
+      id: "a-12",
+      day_id: "day-5",
+      time: "18:30",
+      duration_minutes: 90,
+      title: "Jantar no resort",
+      category: "Hospedagem",
+      location: "Resort Restaurant",
+      address: "Lake Buena Vista, FL",
+      cost: 64,
+      notes: "Encerrar o dia com refeição tranquila e organizar o check-out.",
+      is_completed: false
+    }
+  ]
+};
+
+const categoryMeta = {
+  restaurante: { label: "Restaurante", icon: UtensilsCrossed, accent: "bg-amber-50 text-amber-700 ring-amber-200" },
+  cultura: { label: "Cultura", icon: Landmark, accent: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
+  ponto_turistico: { label: "Ponto turístico", icon: Compass, accent: "bg-sky-50 text-sky-700 ring-sky-200" },
+  passeio: { label: "Passeio", icon: Sparkles, accent: "bg-orange-50 text-orange-700 ring-orange-200" },
+  transporte: { label: "Transporte", icon: CarFront, accent: "bg-blue-50 text-blue-700 ring-blue-200" },
+  hospedagem: { label: "Hospedagem", icon: BedDouble, accent: "bg-violet-50 text-violet-700 ring-violet-200" }
+};
+
+const formatCurrency = (value, currency = "USD") =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+
+const formatShortDate = (value) => {
+  if (!value) return "";
+  const date = new Date(`${value}T12:00:00`);
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short"
+  }).format(date).replace(".", "");
+};
+
+const formatWeekday = (value) => {
+  if (!value) return "";
+  const date = new Date(`${value}T12:00:00`);
+  return new Intl.DateTimeFormat("pt-BR", { weekday: "short" }).format(date).replace(".", "");
+};
+
+const formatDateRange = (startDate, endDate) => {
+  if (!startDate || !endDate) return "";
+  return `${formatShortDate(startDate)} - ${formatShortDate(endDate)}`;
+};
+
+const formatDuration = (minutes) => {
+  const total = Number(minutes || 0);
+  if (!total) return "Tempo livre";
+  const hours = Math.floor(total / 60);
+  const mins = total % 60;
+  if (hours && mins) return `${hours}h ${String(mins).padStart(2, "0")}m`;
+  if (hours) return `${hours}h`;
+  return `${mins}m`;
+};
+
+const activityMeta = (category) => {
+  const normalized = String(category || "").toLowerCase().replace(/\s+/g, "_");
+  return categoryMeta[normalized] || {
+    label: category || "Atividade",
+    icon: MapPinned,
+    accent: "bg-slate-100 text-slate-700 ring-slate-200"
+  };
+};
+
+const cx = (...parts) => parts.filter(Boolean).join(" ");
+
+async function loadItineraryFromSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+
+  const headers = {
+    apikey: SUPABASE_ANON_KEY,
+    Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+  };
+
+  const tripResp = await fetch(
+    `${SUPABASE_URL}/rest/v1/trip?select=*&id=eq.${encodeURIComponent(SUPABASE_TRIP_ID)}&limit=1`,
+    { headers }
+  );
+  if (!tripResp.ok) throw new Error("Não foi possível carregar a viagem.");
+  const tripRows = await tripResp.json();
+  const trip = tripRows?.[0];
+  if (!trip) return null;
+
+  const daysResp = await fetch(
+    `${SUPABASE_URL}/rest/v1/days?select=*&trip_id=eq.${encodeURIComponent(trip.id)}&order=day_number.asc`,
+    { headers }
+  );
+  if (!daysResp.ok) throw new Error("Não foi possível carregar os dias.");
+  const days = await daysResp.json();
+
+  const activitiesResp = days.length
+    ? await fetch(
+        `${SUPABASE_URL}/rest/v1/activities?select=*&day_id=in.(${days.map((day) => day.id).join(",")})&order=time.asc`,
+        { headers }
+      )
+    : null;
+  const activities = activitiesResp?.ok ? await activitiesResp.json() : [];
+
+  return { trip, days, activities };
 }
-i(document.getElementById("root")).render(_(App));
-</script></body></html>
+
+function App() {
+  const [data, setData] = useState(null);
+  const [selectedDayId, setSelectedDayId] = useState(null);
+  const [viewMode, setViewMode] = useState("timeline");
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function boot() {
+      setLoading(true);
+      try {
+        const remote = await loadItineraryFromSupabase();
+        if (!mounted) return;
+        setData(remote || demoData);
+        setToast(remote ? "Sincronizado com Supabase" : "Exibindo dados de demonstração");
+      } catch {
+        if (!mounted) return;
+        setData(demoData);
+        setToast("Exibindo dados de demonstração");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    boot();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!data?.days?.length) return;
+    if (selectedDayId && data.days.some((day) => day.id === selectedDayId)) return;
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayMatch = data.days.find((day) => day.date === todayKey);
+    setSelectedDayId(todayMatch?.id || data.days[0].id);
+  }, [data, selectedDayId]);
+
+  const trip = data?.trip || demoData.trip;
+  const days = data?.days || [];
+  const activities = data?.activities || [];
+
+  const selectedDay = useMemo(() => days.find((day) => day.id === selectedDayId) || days[0], [days, selectedDayId]);
+  const selectedDayActivities = useMemo(
+    () => activities.filter((activity) => activity.day_id === selectedDay?.id).sort((a, b) => String(a.time || "").localeCompare(String(b.time || ""))),
+    [activities, selectedDay]
+  );
+
+  const totals = useMemo(() => {
+    const dayCount = days.length;
+    const activityCount = selectedDayActivities.length;
+    const completedCount = selectedDayActivities.filter((activity) => activity.is_completed).length;
+    const plannedBudget = selectedDayActivities.reduce((sum, activity) => sum + Number(activity.cost || 0), 0);
+    const spentBudget = selectedDayActivities.reduce(
+      (sum, activity) => sum + (activity.is_completed ? Number(activity.cost || 0) : 0),
+      0
+    );
+    const progress = activityCount ? Math.round((completedCount / activityCount) * 100) : 0;
+    return {
+      dayCount,
+      activityCount,
+      completedCount,
+      plannedBudget,
+      spentBudget,
+      progress
+    };
+  }, [days.length, selectedDayActivities]);
+
+  const activeDayLabel = selectedDay ? `Dia ${selectedDay.day_number} • ${selectedDayActivities.length} atividades` : "Selecione um dia";
+  const tripRange = formatDateRange(trip.start_date, trip.end_date);
+  const synced = Boolean(data && !loading);
+
+  const shareTrip = async () => {
+    const payload = {
+      title: trip.title,
+      text: `${trip.title} • ${trip.destination} • ${tripRange}`
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(payload);
+        setToast("Roteiro compartilhado");
+        return;
+      }
+      await navigator.clipboard.writeText(`${payload.title}\n${payload.text}`);
+      setToast("Link copiado para a área de transferência");
+    } catch {
+      setToast("Não foi possível compartilhar agora");
+    }
+  };
+
+  const openMapMode = () => {
+    setViewMode((current) => (current === "timeline" ? "map" : "timeline"));
+    setToast(viewMode === "timeline" ? "Modo mapa ativado" : "Linha do tempo ativada");
+  };
+
+  const toggleCompleted = (activityId) => {
+    setData((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        activities: current.activities.map((activity) =>
+          activity.id === activityId ? { ...activity, is_completed: !activity.is_completed } : activity
+        )
+      };
+    });
+  };
+
+  const actionButtons = [
+    { label: "Compartilhar", icon: Share2, onClick: shareTrip },
+    { label: "Editar", icon: Pencil, onClick: () => setToast("Abrir fluxo de edição") },
+    { label: viewMode === "timeline" ? "Modo Mapa" : "Modo Linha", icon: Globe2, onClick: openMapMode }
+  ];
+
+  return h(
+    "div",
+    { className: "min-h-screen bg-slate-50 text-slate-900" },
+    h("div", { className: "mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-8" },
+      h(HeaderBar, { trip, tripRange, synced, actionButtons, days, totals, loading }),
+      h("main", { className: "mt-5 grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_352px]" },
+        h("section", { className: "space-y-6" },
+          h(TripHero, { trip, tripRange, days, loading, synced }),
+          h(DayTabs, { days, selectedDayId, setSelectedDayId, activeDayLabel, loading }),
+          h(AnimatePresence, { mode: "wait" },
+            viewMode === "timeline"
+              ? h(motion.div, {
+                  key: "timeline",
+                  initial: { opacity: 0, y: 16 },
+                  animate: { opacity: 1, y: 0 },
+                  exit: { opacity: 0, y: -12 },
+                  transition: { duration: 0.25 }
+                }, h(ActivityTimeline, {
+                  day: selectedDay,
+                  activities: selectedDayActivities,
+                  loading,
+                  onToggleCompleted: toggleCompleted
+                }))
+              : h(motion.div, {
+                  key: "map",
+                  initial: { opacity: 0, y: 16 },
+                  animate: { opacity: 1, y: 0 },
+                  exit: { opacity: 0, y: -12 },
+                  transition: { duration: 0.25 }
+                }, h(MapModePanel, {
+                  day: selectedDay,
+                  activities: selectedDayActivities,
+                  onBack: () => setViewMode("timeline")
+                }))
+          )
+        ),
+        h("aside", { className: "space-y-4 lg:sticky lg:top-4 lg:self-start" },
+          h(ProgressWidget, { totals, loading }),
+          h(BudgetWidget, { totals, loading }),
+          h(RoadmapWidget, { day: selectedDay, activities: selectedDayActivities, loading })
+        )
+      ),
+      h(ToastBar, { toast })
+    )
+  );
+}
+
+function HeaderBar({ trip, tripRange, synced, actionButtons, days, totals, loading }) {
+  return h(
+    "div",
+    { className: "flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/75 px-4 py-3 shadow-soft backdrop-blur-md sm:px-5 lg:flex-row lg:items-center lg:justify-between" },
+    h("div", { className: "min-w-0" },
+      h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Itinerary View"),
+      h("div", { className: "mt-1 flex items-center gap-2" },
+        h("h1", { className: "truncate text-base font-semibold text-slate-900 sm:text-lg" }, trip.title),
+        h(StatusPill, { synced, loading })
+      ),
+      h("p", { className: "mt-0.5 text-xs text-slate-500" }, `${trip.destination} • ${tripRange}`)
+    ),
+    h("div", { className: "flex flex-wrap items-center gap-2 lg:hidden" },
+      h(MiniStat, { label: "Dias", value: days.length || "—" }),
+      h(MiniStat, { label: "Concluído", value: `${totals.progress || 0}%` })
+    ),
+    h("div", { className: "flex flex-wrap gap-2 lg:hidden" },
+      ...actionButtons.map((action) =>
+        h(ActionButton, { key: action.label, label: action.label, icon: action.icon, onClick: action.onClick })
+      )
+    ),
+    h("div", { className: "hidden items-center gap-2 lg:flex" },
+      h(MiniStat, { label: "Dias", value: days.length || "—" }),
+      h(MiniStat, { label: "Concluído", value: `${totals.progress || 0}%` }),
+      ...actionButtons.map((action) =>
+        h(ActionButton, { key: action.label, label: action.label, icon: action.icon, onClick: action.onClick })
+      )
+    )
+  );
+}
+
+function StatusPill({ synced, loading }) {
+  return h(
+    "span",
+    {
+      className: cx(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em]",
+        loading
+          ? "bg-slate-100 text-slate-500"
+          : synced
+            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+            : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+      )
+    },
+    h(BadgeCheck, { className: "h-3.5 w-3.5" }),
+    synced ? "Sincronizado" : "Carregando"
+  );
+}
+
+function MiniStat({ label, value }) {
+  return h(
+    "div",
+    { className: "rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-right" },
+    h("p", { className: "text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400" }, label),
+    h("p", { className: "text-sm font-semibold text-slate-900" }, value)
+  );
+}
+
+function ActionButton({ label, icon: Icon, onClick }) {
+  return h(
+    motion.button,
+    {
+      type: "button",
+      whileTap: { scale: 0.98 },
+      onClick,
+      className:
+        "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-700"
+    },
+    h(Icon, { className: "h-4 w-4" }),
+    label
+  );
+}
+
+function TripHero({ trip, tripRange, days, loading, synced }) {
+  const participants = [
+    { name: "Ana", color: "bg-emerald-500" },
+    { name: "Bruno", color: "bg-sky-500" },
+    { name: "Carla", color: "bg-amber-500" }
+  ];
+
+  return h(
+    motion.section,
+    {
+      initial: { opacity: 0, y: 18 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.35 },
+      className: "relative overflow-hidden rounded-[2rem] border border-white/60 bg-slate-900 shadow-soft"
+    },
+    h("div", {
+      className: "absolute inset-0 bg-cover bg-center",
+      style: {
+        backgroundImage: `url(${resolveCoverImage(trip.cover_image_url)})`
+      }
+    }),
+    h("div", { className: "absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-900/30" }),
+    h("div", { className: "absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.28),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.18),transparent_24%)]" }),
+    h("div", { className: "relative flex min-h-[360px] flex-col justify-between p-6 sm:p-8" },
+      h("div", { className: "flex flex-wrap items-start justify-between gap-4" },
+        h("div", { className: "max-w-2xl" },
+          h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.34em] text-emerald-200/90" }, trip.destination),
+          h("h2", { className: "mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-5xl" }, trip.title),
+          h("div", { className: "mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-200/90" },
+            h("span", { className: "inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur" },
+              h(CalendarDays, { className: "h-4 w-4" }),
+              tripRange
+            ),
+            h("span", { className: "inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur" },
+              h(CircleDot, { className: "h-4 w-4" }),
+              `${days.length || 0} dias planejados`
+            ),
+            h("span", { className: "inline-flex items-center gap-2 rounded-full bg-emerald-400/15 px-3 py-1.5 text-emerald-100 ring-1 ring-emerald-300/20 backdrop-blur" },
+              h(Star, { className: "h-4 w-4" }),
+              synced ? "Sincronizado no Supabase" : "Carregando dados"
+            )
+          )
+        ),
+        h("div", { className: "w-full max-w-[280px] self-start rounded-3xl border border-white/15 bg-white/10 p-3 text-white shadow-2xl backdrop-blur-md sm:-mt-2" },
+          h("div", { className: "overflow-hidden rounded-[1.4rem] border border-white/10 bg-slate-950/30" },
+            h("img", {
+              src: resolveCoverImage(trip.cover_image_url),
+              alt: `${trip.destination} - capa da viagem`,
+              className: "h-44 w-full object-cover"
+            })
+          ),
+          h("div", { className: "p-3" },
+            h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70" }, "Capa do destino"),
+            h("p", { className: "mt-1 text-sm font-semibold text-white" }, "Imagem destacada da viagem"),
+            h("p", { className: "mt-2 text-xs leading-5 text-slate-200/80" }, "Foto real de Orlando salva localmente no projeto.")
+          )
+        )
+      ),
+      h("div", { className: "grid gap-4 sm:grid-cols-3 mt-2" },
+        h(HeroStat, { label: "Dias", value: `${days.length || 0}`, accent: "text-emerald-200" }),
+        h(HeroStat, { label: "Timeline", value: loading ? "..." : "Atualizada", accent: "text-sky-200" }),
+        h(HeroStat, { label: "Notas", value: "Sincronizadas", accent: "text-amber-200" })
+      ),
+      h("div", { className: "hidden items-center justify-end gap-2 sm:flex" },
+        h("div", { className: "inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs font-semibold text-white/80 backdrop-blur" },
+          h(Users, { className: "h-4 w-4" }),
+          `${participants.length} participantes`
+        )
+      )
+    )
+  );
+}
+
+function HeroStat({ label, value, accent }) {
+  return h(
+    "div",
+    { className: "rounded-2xl border border-white/10 bg-white/10 px-4 py-4 text-white backdrop-blur-sm" },
+    h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.28em] text-white/60" }, label),
+    h("p", { className: cx("mt-2 text-2xl font-bold", accent) }, value)
+  );
+}
+
+function DayTabs({ days, selectedDayId, setSelectedDayId, activeDayLabel, loading }) {
+  return h(
+    "section",
+    { className: "rounded-3xl border border-slate-200 bg-white p-3 shadow-soft" },
+    h("div", { className: "flex items-center justify-between gap-3 px-2 pb-3" },
+      h("div", null,
+        h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400" }, "Dias do roteiro"),
+        h("h3", { className: "mt-1 text-sm font-semibold text-slate-900 sm:text-base" }, activeDayLabel)
+      ),
+      h("div", { className: "hidden items-center gap-2 sm:flex" },
+        h(ChevronLeft, { className: "h-4 w-4 text-slate-300" }),
+        h(ChevronRight, { className: "h-4 w-4 text-slate-300" })
+      )
+    ),
+    h("div", {
+      className: "scrollbar-hide flex gap-2 overflow-x-auto pb-1",
+      style: { scrollbarWidth: "none" }
+    },
+      loading
+        ? Array.from({ length: 4 }).map((_, index) =>
+            h("div", {
+              key: index,
+              className: "h-[82px] min-w-[118px] animate-pulse rounded-2xl border border-slate-200 bg-slate-100"
+            })
+          )
+        : days.map((day) =>
+            h(
+              motion.button,
+              {
+                key: day.id,
+                whileTap: { scale: 0.99 },
+                onClick: () => setSelectedDayId(day.id),
+                className: cx(
+                  "min-w-[126px] rounded-2xl border px-4 py-3 text-left transition",
+                  selectedDayId === day.id
+                    ? "border-emerald-200 bg-emerald-50 shadow-sm"
+                    : "border-slate-200 bg-white hover:border-slate-300"
+                )
+              },
+              h("p", {
+                className: cx(
+                  "text-[10px] font-semibold uppercase tracking-[0.28em]",
+                  selectedDayId === day.id ? "text-emerald-700" : "text-slate-400"
+                )
+              }, `Dia ${day.day_number}`),
+              h("p", { className: "mt-2 text-sm font-semibold text-slate-900" }, formatShortDate(day.date)),
+              h("p", { className: "mt-1 max-h-10 overflow-hidden text-xs leading-5 text-slate-500" }, day.summary || `${day.day_number}º dia do roteiro`)
+            )
+          )
+    )
+  );
+}
+
+function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
+  return h(
+    "section",
+    { className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5" },
+    h("div", { className: "flex flex-wrap items-end justify-between gap-4 border-b border-slate-100 pb-4" },
+      h("div", null,
+        h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Linha do tempo"),
+        h("h3", { className: "mt-1 text-xl font-bold text-slate-900 sm:text-2xl" }, day ? `Dia ${day.day_number}` : "Selecione um dia"),
+        h("p", { className: "mt-1 text-sm text-slate-500" }, day?.summary || "Detalhamento das atividades do dia.")
+      ),
+      h("div", { className: "rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500" }, `${activities.length} atividades`)
+    ),
+    h("div", { className: "mt-5" },
+      loading
+        ? h(ActivitySkeleton, null)
+        : activities.length
+          ? h("div", { className: "relative space-y-4" },
+              h("div", { className: "absolute left-[18px] top-0 h-full w-px bg-gradient-to-b from-emerald-300 via-slate-200 to-transparent" }),
+              activities.map((activity, index) =>
+                h(motion.div, {
+                  key: activity.id,
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { duration: 0.24, delay: index * 0.04 },
+                  className: "relative pl-12"
+                },
+                  h("div", {
+                    className: cx(
+                      "absolute left-0 top-6 h-5 w-5 rounded-full border-4 border-white shadow-sm",
+                      activity.is_completed ? "bg-emerald-500" : "bg-slate-300"
+                    )
+                  }),
+                  h(ActivityCard, { activity, onToggleCompleted })
+                )
+              )
+            )
+          : h(EmptyDayState, null)
+    )
+  );
+}
+
+function ActivityCard({ activity, onToggleCompleted }) {
+  const meta = activityMeta(activity.category);
+  const Icon = meta.icon;
+  const mapUrl = `https://maps.google.com/?q=${encodeURIComponent(activity.address || activity.location || activity.title || "")}`;
+
+  return h(
+    "article",
+    {
+      className: cx(
+        "overflow-hidden rounded-3xl border p-4 shadow-sm transition",
+        activity.is_completed ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-white hover:shadow-md"
+      )
+    },
+    h("div", { className: "flex flex-col gap-4 md:flex-row md:items-start md:justify-between" },
+      h("div", { className: "min-w-0 flex-1" },
+        h("div", { className: "flex flex-wrap items-center gap-2" },
+          h("span", { className: "inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" },
+            h(Clock3, { className: "h-3.5 w-3.5" }),
+            activity.time || "--:--"
+          ),
+          h("span", { className: "inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700" },
+            formatDuration(activity.duration_minutes)
+          ),
+          h("span", { className: cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1", meta.accent) },
+            h(Icon, { className: "h-3.5 w-3.5" }),
+            meta.label
+          )
+        ),
+        h("div", { className: "mt-3 flex items-start gap-3" },
+          h("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm" },
+            h(Icon, { className: "h-5 w-5" })
+          ),
+          h("div", { className: "min-w-0" },
+            h("h4", {
+              className: cx(
+                "text-base font-bold text-slate-900 sm:text-lg",
+                activity.is_completed && "text-slate-500 line-through decoration-2 decoration-emerald-300"
+              )
+            }, activity.title),
+            h("p", { className: "mt-1 text-sm text-slate-500" }, activity.location || "Local não informado"),
+            h("div", { className: "mt-3 flex flex-wrap items-center gap-2" },
+              h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" }, `${meta.label} • ${formatCurrency(activity.cost || 0)}`),
+              activity.is_completed
+                ? h("span", { className: "rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700" }, "Concluída")
+                : h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500" }, "Pendente")
+            )
+          )
+        ),
+        activity.address
+          ? h("div", { className: "mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-500" },
+              h(Compass, { className: "h-4 w-4 text-slate-400" }),
+              h("span", { className: "break-words" }, activity.address)
+            )
+          : null,
+        activity.notes
+          ? h("div", { className: "mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-100" },
+              h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400" }, "Notas"),
+              h("p", { className: "mt-1 leading-6" }, activity.notes)
+            )
+          : null
+      ),
+      h("div", { className: "flex flex-row items-center gap-2 md:flex-col md:items-end" },
+        h(motion.label, {
+          whileTap: { scale: 0.98 },
+          className: "inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+        },
+          h("input", {
+            type: "checkbox",
+            className: "h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500",
+            checked: Boolean(activity.is_completed),
+            onChange: () => onToggleCompleted(activity.id)
+          }),
+          "Concluída"
+        ),
+        h("a", {
+          href: mapUrl,
+          target: "_blank",
+          rel: "noreferrer",
+          className: "inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+        },
+          "Abrir no mapa",
+          h(ExternalLink, { className: "h-4 w-4" })
+        )
+      )
+    )
+  );
+}
+
+function ActivitySkeleton() {
+  return h("div", { className: "space-y-4" },
+    Array.from({ length: 3 }).map((_, index) =>
+      h("div", {
+        key: index,
+        className: "rounded-3xl border border-slate-200 bg-slate-50 p-4"
+      },
+        h("div", { className: "h-4 w-32 animate-pulse rounded-full bg-slate-200" }),
+        h("div", { className: "mt-4 h-20 animate-pulse rounded-2xl bg-slate-200/80" })
+      )
+    )
+  );
+}
+
+function EmptyDayState() {
+  return h(
+    "div",
+    { className: "rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center" },
+    h("div", { className: "mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm" },
+      h(Sparkles, { className: "h-6 w-6" })
+    ),
+    h("h4", { className: "mt-4 text-lg font-semibold text-slate-900" }, "Sem atividades neste dia"),
+    h("p", { className: "mt-1 text-sm text-slate-500" }, "Quando os dados do Supabase chegarem, os cards aparecem automaticamente aqui.")
+  );
+}
+
+function MapModePanel({ day, activities, onBack }) {
+  return h(
+    "section",
+    { className: "rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft sm:p-5" },
+    h("div", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4" },
+      h("div", null,
+        h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-700/70" }, "Modo mapa"),
+        h("h3", { className: "mt-1 text-xl font-bold text-slate-900" }, day ? `Dia ${day.day_number}` : "Mapa do roteiro")
+      ),
+      h("button", {
+        type: "button",
+        onClick: onBack,
+        className: "inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+      }, h(ChevronLeft, { className: "h-4 w-4" }), "Voltar")
+    ),
+    h("div", { className: "mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]" },
+      h("div", { className: "relative min-h-[320px] overflow-hidden rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#effaf8_0%,#f8fafc_45%,#edf7ff_100%)] p-4" },
+        h("div", { className: "absolute inset-0 opacity-70", style: {
+          backgroundImage:
+            "linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)",
+          backgroundSize: "44px 44px"
+        } }),
+        h("div", { className: "relative flex h-full flex-col justify-between" },
+          h("div", { className: "flex items-center justify-between" },
+            h("div", { className: "rounded-2xl bg-white/80 px-3 py-2 shadow-sm backdrop-blur" },
+              h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-400" }, "Rota do dia"),
+              h("p", { className: "mt-1 text-sm font-semibold text-slate-900" }, `${activities.length} paradas`)
+            ),
+            h("div", { className: "rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm" }, "Preview")
+          ),
+          h("div", { className: "relative mx-auto h-56 w-full max-w-xl" },
+            activities.slice(0, 4).map((activity, index) =>
+              h("div", {
+                key: activity.id,
+                className: "absolute"
+              },
+                h("div", {
+                  className: cx(
+                    "flex h-12 w-12 items-center justify-center rounded-full border-4 border-white shadow-md",
+                    index === 0 ? "bg-emerald-500" : index === 1 ? "bg-sky-500" : index === 2 ? "bg-amber-500" : "bg-violet-500"
+                  ),
+                  style: {
+                    top: `${20 + index * 18}%`,
+                    left: `${14 + index * 18}%`
+                  }
+                }, h(CircleDot, { className: "h-5 w-5 text-white" })),
+                index < activities.slice(0, 4).length - 1
+                  ? h("div", {
+                      className: "absolute h-px bg-slate-300",
+                      style: {
+                        top: `${43 + index * 18}%`,
+                        left: `${20 + index * 18}%`,
+                        width: "72px",
+                        transform: "rotate(24deg)",
+                        transformOrigin: "left center"
+                      }
+                    })
+                  : null
+              )
+            )
+          )
+        )
+      ),
+      h("div", { className: "space-y-3" },
+        activities.length
+          ? activities.map((activity) =>
+              h("div", {
+                key: activity.id,
+                className: "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+              },
+                h("div", { className: "flex items-start justify-between gap-3" },
+                  h("div", null,
+                    h("p", { className: "text-sm font-semibold text-slate-900" }, activity.title),
+                    h("p", { className: "mt-1 text-xs text-slate-500" }, activity.address || activity.location || "Local não informado")
+                  ),
+                  h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" }, activity.time || "--:--")
+                ),
+                h("a", {
+                  href: `https://maps.google.com/?q=${encodeURIComponent(activity.address || activity.location || activity.title || "")}`,
+                  target: "_blank",
+                  rel: "noreferrer",
+                  className: "mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
+                }, "Abrir no mapa", h(ExternalLink, { className: "h-4 w-4" }))
+              )
+            )
+          : h(EmptyDayState, null)
+      )
+    )
+  );
+}
+
+function ProgressWidget({ totals, loading }) {
+  return h(
+    "section",
+    { className: "rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft" },
+    h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-slate-400" }, "Progresso"),
+    h("h3", { className: "mt-1 text-lg font-bold text-slate-900" }, "Conclusão do dia"),
+    h("div", { className: "mt-5" },
+      h("div", { className: "mb-2 flex items-center justify-between text-sm" },
+        h("span", { className: "text-slate-500" }, "Atividades concluídas"),
+        h("span", { className: "font-semibold text-slate-900" }, loading ? "..." : `${totals.completedCount}/${totals.activityCount}`)
+      ),
+      h("div", { className: "h-3 overflow-hidden rounded-full bg-slate-100" },
+        h("div", {
+          className: "h-full rounded-full bg-gradient-to-r from-emerald-500 to-sky-500 transition-all duration-500",
+          style: { width: `${loading ? 0 : totals.progress}%` }
+        })
+      ),
+      h("p", { className: "mt-3 text-sm text-slate-500" }, loading ? "Carregando progresso..." : `${totals.progress}% do dia foi concluído.`)
+    )
+  );
+}
+
+function BudgetWidget({ totals, loading }) {
+  return h(
+    "section",
+    { className: "rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft" },
+    h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-slate-400" }, "Orçamento"),
+    h("h3", { className: "mt-1 text-lg font-bold text-slate-900" }, "Previsto x gasto real"),
+    h("div", { className: "mt-5 grid gap-3" },
+      h(BudgetRow, { label: "Previsto", value: loading ? "..." : formatCurrency(totals.plannedBudget), tone: "text-slate-900" }),
+      h(BudgetRow, { label: "Gasto real", value: loading ? "..." : formatCurrency(totals.spentBudget), tone: "text-emerald-700" }),
+      h(BudgetRow, { label: "Restante", value: loading ? "..." : formatCurrency(Math.max(totals.plannedBudget - totals.spentBudget, 0)), tone: "text-amber-700" })
+    ),
+    h("p", { className: "mt-4 text-xs leading-5 text-slate-500" }, "Como o schema atual traz apenas `cost`, o gasto real considera as atividades marcadas como concluídas.")
+  );
+}
+
+function BudgetRow({ label, value, tone }) {
+  return h(
+    "div",
+    { className: "flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3" },
+    h("span", { className: "text-sm text-slate-500" }, label),
+    h("span", { className: cx("text-base font-bold", tone) }, value)
+  );
+}
+
+function RoadmapWidget({ day, activities, loading }) {
+  const topLocations = activities.slice(0, 3);
+  return h(
+    "section",
+    { className: "rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft" },
+    h("p", { className: "text-[10px] font-semibold uppercase tracking-[0.32em] text-slate-400" }, "Resumo rápido"),
+    h("h3", { className: "mt-1 text-lg font-bold text-slate-900" }, day ? `Dia ${day.day_number}` : "Dia selecionado"),
+    h("div", { className: "mt-5 space-y-3" },
+      loading
+        ? Array.from({ length: 3 }).map((_, index) =>
+            h("div", { key: index, className: "h-16 animate-pulse rounded-2xl bg-slate-100" })
+          )
+        : topLocations.length
+          ? topLocations.map((activity, index) =>
+              h("div", {
+                key: activity.id,
+                className: "flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3"
+              },
+                h("div", { className: "mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white" }, String(index + 1)),
+                h("div", { className: "min-w-0 flex-1" },
+                  h("p", { className: "truncate text-sm font-semibold text-slate-900" }, activity.title),
+                  h("p", { className: "mt-1 text-xs text-slate-500" }, `${activity.time || "--:--"} • ${activity.location || activity.address || "Sem local"}`)
+                )
+              )
+            )
+          : h("p", { className: "rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-500" }, "Escolha um dia para ver o resumo das paradas.")
+    )
+  );
+}
+
+function ToastBar({ toast }) {
+  return h(
+    AnimatePresence,
+    null,
+    toast
+      ? h(motion.div, {
+          key: toast,
+          initial: { opacity: 0, y: 12 },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, y: 12 },
+          transition: { duration: 0.2 },
+          className: "fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg"
+        }, toast)
+      : null
+  );
+}
+
+createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
