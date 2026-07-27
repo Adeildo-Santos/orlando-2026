@@ -793,9 +793,7 @@ function ActivityTimeline({ day, activities, loading, onToggleCompleted }) {
 function ActivityCard({ activity, onToggleCompleted }) {
   const meta = activityMeta(activity.category);
   const Icon = meta.icon;
-  const mapUrl = activity.latitude && activity.longitude
-    ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
-    : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
+  const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`;
 
   return h(
     "article",
@@ -1091,9 +1089,7 @@ function MapModePanel({ day, activities, onBack }) {
                   h("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600" }, activity.time || "--:--")
                 ),
                 h("a", {
-                  href: activity.latitude && activity.longitude
-                    ? `https://www.google.com/maps?q=${activity.latitude},${activity.longitude}`
-                    : `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`,
+                  href: `https://www.google.com/maps?q=${encodeURIComponent(activity.address || activity.place_name || activity.title || "")}`,
                   target: "_blank",
                   rel: "noreferrer",
                   className: "mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
